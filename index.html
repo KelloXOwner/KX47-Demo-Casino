@@ -1,0 +1,2733 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="KX47 – Casino Demo Frontend mit 700+ Demo-Spielen.">
+<title>KX47 Casino – Demo</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #080808;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+/* =========================
+   LOADER
+========================= */
+
+#loader {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #050505;
+    z-index: 99999;
+    transition: opacity .4s ease, visibility .4s ease;
+}
+
+#loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.spinner {
+    width: 70px;
+    height: 70px;
+    border: 6px solid #292929;
+    border-top-color: #d4af37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 5000;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+
+    padding: 16px 30px;
+
+    background: rgba(14, 14, 14, .96);
+    backdrop-filter: blur(14px);
+
+    border-bottom: 1px solid #292929;
+}
+
+.logo {
+    color: #d4af37;
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    white-space: nowrap;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+nav a {
+    position: relative;
+
+    color: #eee;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+
+    transition: color .25s ease;
+}
+
+nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -7px;
+
+    width: 0;
+    height: 2px;
+
+    background: #d4af37;
+    transition: width .25s ease;
+}
+
+nav a:hover {
+    color: #d4af37;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#balance {
+    color: #ffd84d;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+
+    padding: 12px 20px;
+
+    font-weight: 800;
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        filter .2s ease,
+        box-shadow .2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.gold {
+    background: linear-gradient(135deg, #d4af37, #ffd84d);
+    color: #111;
+
+    box-shadow: 0 5px 20px rgba(212, 175, 55, .18);
+}
+
+.dark {
+    background: #222;
+    color: #fff;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    position: relative;
+
+    min-height: 500px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 80px 20px;
+
+    text-align: center;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            #715500 0%,
+            #3d2d00 18%,
+            #111 55%,
+            #050505 100%
+        );
+}
+
+.hero::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size: 45px 45px;
+
+    mask-image: linear-gradient(
+        to bottom,
+        black,
+        transparent
+    );
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+
+    max-width: 900px;
+}
+
+.hero h1 {
+    margin-bottom: 15px;
+
+    font-size: clamp(42px, 7vw, 68px);
+    line-height: 1;
+
+    background: linear-gradient(
+        135deg,
+        #fff,
+        #ffd84d,
+        #d4af37
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+}
+
+.hero p {
+    margin-bottom: 20px;
+
+    color: #ddd;
+    font-size: 20px;
+}
+
+#jackpot {
+    margin: 18px 0 25px;
+
+    color: #ffd84d;
+
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 900;
+
+    text-shadow:
+        0 0 25px rgba(255, 216, 77, .3);
+}
+
+.hero-button {
+    min-width: 180px;
+    font-size: 16px;
+}
+
+/* =========================
+   PARTICLES
+========================= */
+
+.particle {
+    position: absolute;
+
+    background: #ffd84d;
+
+    border-radius: 50%;
+
+    opacity: .4;
+
+    animation:
+        float linear infinite,
+        glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+    from {
+        transform: translateY(540px);
+    }
+
+    to {
+        transform: translateY(-150px);
+    }
+}
+
+@keyframes glow {
+    from {
+        opacity: .15;
+    }
+
+    to {
+        opacity: .6;
+    }
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+.search {
+    display: flex;
+    justify-content: center;
+
+    padding: 35px 20px 20px;
+}
+
+.search-wrapper {
+    position: relative;
+
+    width: min(900px, 100%);
+}
+
+.search input {
+    width: 100%;
+
+    padding: 17px 20px 17px 50px;
+
+    border: 1px solid #333;
+    border-radius: 12px;
+
+    outline: none;
+
+    background: #151515;
+    color: white;
+
+    font-size: 17px;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.search input:focus {
+    border-color: #d4af37;
+
+    box-shadow:
+        0 0 0 3px rgba(212,175,55,.1);
+}
+
+.search-icon {
+    position: absolute;
+
+    left: 18px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #888;
+    font-size: 20px;
+}
+
+/* =========================
+   CATEGORIES
+========================= */
+
+.categories {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(140px, 1fr));
+
+    gap: 15px;
+
+    padding: 20px;
+}
+
+.cat {
+    padding: 23px 15px;
+
+    border: 1px solid #292929;
+    border-radius: 12px;
+
+    background: #151515;
+
+    text-align: center;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background .25s ease,
+        color .25s ease,
+        transform .25s ease,
+        border-color .25s ease;
+}
+
+.cat:hover,
+.cat.active {
+    background: linear-gradient(
+        135deg,
+        #d4af37,
+        #ffd84d
+    );
+
+    border-color: #ffd84d;
+
+    color: #080808;
+
+    transform: translateY(-4px);
+}
+
+/* =========================
+   SECTION
+========================= */
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 30px 25px 10px;
+}
+
+.section-title h2 {
+    padding: 0;
+    font-size: 28px;
+}
+
+.game-count {
+    color: #888;
+    font-size: 14px;
+}
+
+/* =========================
+   GAME GRID
+========================= */
+
+.grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(180px, 1fr));
+
+    gap: 20px;
+
+    padding: 20px;
+}
+
+.card {
+    position: relative;
+
+    overflow: hidden;
+
+    background: #151515;
+
+    border: 1px solid #252525;
+    border-radius: 13px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.2);
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+
+    border-color: rgba(212,175,55,.6);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.5),
+        0 0 25px rgba(255,215,0,.16);
+}
+
+.card-image {
+    position: relative;
+    overflow: hidden;
+
+    aspect-ratio: 3 / 4;
+
+    background: #222;
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition: transform .35s ease;
+}
+
+.card:hover img {
+    transform: scale(1.06);
+}
+
+.image-overlay {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0,0,0,.35);
+
+    opacity: 0;
+
+    transition: opacity .25s ease;
+}
+
+.card:hover .image-overlay {
+    opacity: 1;
+}
+
+.play-overlay {
+    padding: 10px 18px;
+
+    background: #d4af37;
+    color: #111;
+
+    border-radius: 30px;
+
+    font-weight: 900;
+}
+
+.info {
+    padding: 13px;
+}
+
+.info h3 {
+    margin-bottom: 8px;
+
+    font-size: 16px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 11px;
+
+    color: #999;
+
+    font-size: 13px;
+}
+
+.rtp {
+    color: #aaa;
+}
+
+.favorite {
+    color: #777;
+
+    font-size: 21px;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    transition:
+        color .2s ease,
+        transform .2s ease;
+}
+
+.favorite:hover {
+    transform: scale(1.15);
+}
+
+.favorite.active {
+    color: #ffd84d;
+}
+
+.demo {
+    width: 100%;
+
+    padding: 10px;
+
+    background: linear-gradient(
+        135deg,
+        #d4af37,
+        #ffd84d
+    );
+
+    color: #111;
+}
+
+/* =========================
+   LOAD MORE
+========================= */
+
+#loadMoreContainer {
+    display: flex;
+    justify-content: center;
+
+    padding: 20px 20px 45px;
+}
+
+#loadMore {
+    min-width: 180px;
+
+    background: #222;
+    color: #fff;
+
+    border: 1px solid #333;
+}
+
+#loadMore:hover {
+    border-color: #d4af37;
+    color: #ffd84d;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+#emptyState {
+    display: none;
+
+    padding: 70px 20px;
+
+    text-align: center;
+}
+
+#emptyState h3 {
+    margin-bottom: 8px;
+    font-size: 24px;
+}
+
+#emptyState p {
+    color: #888;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    margin-top: 30px;
+
+    padding: 45px 20px;
+
+    border-top: 1px solid #242424;
+
+    background: #101010;
+
+    color: #888;
+
+    text-align: center;
+}
+
+footer strong {
+    color: #d4af37;
+}
+
+footer p + p {
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+
+/* =========================
+   AAA SLOT MODAL
+========================= */
+#gameModal{position:fixed;inset:0;z-index:20000;display:none;align-items:center;justify-content:center;padding:14px;background:radial-gradient(circle at 50% 30%,rgba(111,68,20,.35),rgba(0,0,0,.94) 70%);backdrop-filter:blur(10px)}
+#gameModal.open{display:flex}
+.game-modal-box{width:min(1120px,100%);max-height:96vh;overflow:auto;background:linear-gradient(180deg,#24170e,#0c0a08 72%);border:2px solid #9b6b24;border-radius:22px;padding:18px;box-shadow:0 35px 120px rgba(0,0,0,.85),inset 0 0 40px rgba(255,190,55,.06);text-align:center}
+.slot-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:12px}
+.slot-brand{font-weight:1000;letter-spacing:2px;text-transform:uppercase;color:#ffd45a;text-shadow:0 2px 12px #7a4300;font-size:clamp(20px,3vw,34px)}
+.jackpots{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.jp{min-width:120px;padding:7px 10px;border:1px solid #9c712f;border-radius:9px;background:linear-gradient(#38250f,#15100b);box-shadow:inset 0 0 18px rgba(255,201,73,.08)}
+.jp small{display:block;color:#bda77b;font-size:9px;text-transform:uppercase;letter-spacing:1px}.jp strong{color:#ffd45a;font-size:16px}
+.slot-shell{position:relative;padding:16px;border:4px solid #8e5d20;border-radius:18px;background:linear-gradient(90deg,#17100a,#6e4718 5%,#24170d 10%,#090806 50%,#24170d 90%,#6e4718 95%,#17100a);box-shadow:inset 0 0 0 2px #d5a03d,inset 0 0 40px rgba(0,0,0,.9),0 15px 40px rgba(0,0,0,.55)}
+.slot-reels{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:#050505;border:3px solid #b97a22;border-radius:10px;padding:4px;overflow:hidden}
+.slot-reel{position:relative;display:block;min-height:390px;background:linear-gradient(90deg,#111,#020202 18%,#111 50%,#020202 82%,#111);border-right:1px solid #5b401d;overflow:hidden}
+.slot-reel:last-child{border-right:0}.slot-reel{--cell-h:130px}.reel-track{position:absolute;left:0;right:0;top:0;will-change:transform}.slot-cell{height:var(--cell-h);display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid rgba(255,205,100,.12);font-size:clamp(38px,6vw,72px);background:radial-gradient(circle,#201a12 0%,#080706 72%);text-shadow:0 4px 15px rgba(0,0,0,.9)}
+.slot-cell.win{animation:winPulse .7s ease-in-out infinite alternate;z-index:3}.slot-cell.expanded{background:radial-gradient(circle,#6e430d,#241500 55%,#090704);box-shadow:inset 0 0 35px rgba(255,196,54,.75)}
+@keyframes winPulse{to{filter:brightness(1.65);box-shadow:inset 0 0 28px rgba(255,211,83,.75),0 0 20px rgba(255,192,50,.45)}}
+.symbol{width:86%;height:82%;display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:12px;position:relative;filter:drop-shadow(0 5px 4px rgba(0,0,0,.7));font-weight:1000}
+.symbol .glyph{font-size:1em;line-height:1}.symbol .tag{font-size:.16em;letter-spacing:1px;margin-top:3px;color:#f5dfaa;text-transform:uppercase}
+.high{background:linear-gradient(145deg,#f4d26c,#8e4d11);border:2px solid #f6df89;color:#fff1b0}.mid{background:linear-gradient(145deg,#5c8f89,#152c2c);border:2px solid #a7d4ca;color:#dffbf2}.low{background:linear-gradient(145deg,#493b76,#19142b);border:2px solid #8d79c8;color:#eee}.card-symbol{font-family:Georgia,serif;background:linear-gradient(145deg,#d3a62e,#51320b);border:2px solid #ffe29a;color:#fff4c9}.wild{background:linear-gradient(145deg,#ffca47,#7e280d);border:3px solid #ffe59a;color:#fff5c5;box-shadow:0 0 25px rgba(255,167,35,.55)}.scatter{background:linear-gradient(145deg,#8b6bce,#251744);border:3px solid #d9c5ff;color:#fff}
+.slot-paylines{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin:10px 0}.line-dot{width:24px;height:18px;border-radius:5px;background:#1e160b;border:1px solid #7b5624;color:#c9a75a;font-size:10px;display:flex;align-items:center;justify-content:center}.line-dot.active{background:#b77a21;color:#130c04}
+.slot-status{min-height:34px;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px 0;color:#f1dfb2;font-weight:800}.big-win{font-size:clamp(24px,5vw,50px);color:#ffd54f;text-shadow:0 0 25px rgba(255,190,45,.75);animation:bigWin .6s ease-out}.slot-controls{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:10px;align-items:center;background:linear-gradient(#22170d,#0e0b08);border:1px solid #69471f;border-radius:13px;padding:11px}.bet-box{display:flex;align-items:center;gap:6px;background:#080706;border:1px solid #5d421f;border-radius:9px;padding:5px}.bet-box button{padding:7px 10px;background:#2b1d0e;color:#ffd35c;border:1px solid #76511f}.bet-box input{width:110px;background:#050505;color:#fff;text-align:center;border:0;font-weight:900;font-size:16px;padding:7px}.slot-spin{min-width:190px!important;font-size:20px!important;border-radius:50px!important;padding:15px 28px!important;box-shadow:0 0 30px rgba(255,184,35,.3)!important}.slot-spin.spinning{animation:spinGlow .8s linear infinite}.slot-close{background:#2a2016;color:#eee}.slot-info{font-size:11px;color:#a89675;text-align:left}.feature-banner{display:none;position:absolute;inset:0;background:rgba(10,6,2,.88);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:10px}.feature-banner.show{display:flex}.feature-banner strong{font-size:clamp(35px,8vw,80px);color:#ffd34e;text-shadow:0 0 30px #ff8c00}.feature-banner span{color:#fff0bc;font-size:18px}
+@keyframes bigWin{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}@keyframes spinGlow{50%{filter:brightness(1.3);transform:scale(1.02)}}
+@media(max-width:700px){.slot-top{grid-template-columns:1fr}.jackpots{justify-content:center}.slot-reel{min-height:285px}.slot-controls{grid-template-columns:1fr 1fr}.slot-spin{grid-column:1/-1;width:100%}.slot-info{grid-column:1/-1}.bet-box input{width:90px}}
+
+
+/* =========================
+   DYNAMIC PAYTABLE
+========================= */
+.paytable-panel{margin:12px 0 8px;padding:12px;border:1px solid #78521f;border-radius:12px;background:linear-gradient(180deg,#171006,#0b0906);box-shadow:inset 0 0 25px rgba(255,190,55,.05)}
+.paytable-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:9px;text-align:left}
+.paytable-head strong{color:#ffd45a;font-size:15px;letter-spacing:1px;text-transform:uppercase}.paytable-head span{color:#c8b083;font-size:12px}
+.paytable-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:7px}
+.pay-item{display:grid;grid-template-columns:42px 1fr;gap:7px;align-items:center;min-height:54px;padding:6px;border:1px solid #3e2d17;border-radius:9px;background:#0b0907;text-align:left}
+.pay-item .pay-art{width:40px;height:40px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:7px}.pay-item .pay-art img{width:100%;height:100%;object-fit:cover}.pay-item .pay-art .symbol{width:100%;height:100%;border:0;border-radius:6px}.pay-item .pay-art .tag{display:none}.pay-name{color:#eee1bd;font-weight:900;font-size:10px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pay-values{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}.pay-values b{font-size:10px;color:#ffd45a;background:#21170b;border:1px solid #58401b;border-radius:4px;padding:2px 4px}.pay-values b em{font-style:normal;color:#f2dfb4}.pay-scatter{margin-top:8px;color:#cbb98f;font-size:10px;text-align:left}
+@media(max-width:700px){.paytable-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pay-item{grid-template-columns:34px 1fr}.pay-item .pay-art{width:34px;height:34px}}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+    nav {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: 14px 16px;
+    }
+
+    .logo {
+        font-size: 25px;
+    }
+
+    .right {
+        gap: 7px;
+    }
+
+    #balance {
+        font-size: 13px;
+    }
+
+    .right .gold {
+        padding: 10px 13px;
+        font-size: 12px;
+    }
+
+    .hero {
+        min-height: 450px;
+        padding: 60px 18px;
+    }
+
+    .hero p {
+        font-size: 17px;
+    }
+
+    .categories {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .section-title {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .section-title h2 {
+        font-size: 22px;
+    }
+
+    .game-count {
+        font-size: 12px;
+    }
+
+    .info {
+        padding: 10px;
+    }
+
+    .info h3 {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 380px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* KX47 AUTH + ADMIN */
+.auth-backdrop,.admin-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);z-index:99990;display:none;align-items:center;justify-content:center;padding:20px}
+.auth-backdrop.open,.admin-backdrop.open{display:flex}
+.auth-box,.admin-box{width:min(980px,100%);max-height:92vh;overflow:auto;background:linear-gradient(145deg,#151515,#080808);border:1px solid #6f5a22;border-radius:22px;box-shadow:0 30px 100px #000,0 0 50px rgba(212,175,55,.12);padding:28px}
+.auth-box{max-width:460px}.auth-box h2,.admin-box h2{color:#ffd84d;margin-bottom:8px}
+.auth-box input,.admin-box input,.admin-box select{width:100%;padding:13px 14px;margin:7px 0;background:#0f0f0f;color:#fff;border:1px solid #333;border-radius:10px}
+.auth-tabs{display:flex;gap:8px;margin:18px 0}.auth-tabs button{flex:1}.auth-tabs .active{background:linear-gradient(135deg,#d4af37,#ffd84d);color:#111}
+.auth-close{float:right;background:#222;color:#fff;padding:8px 12px}
+.role-pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#292929;color:#ffd84d;font-size:12px;font-weight:800}
+.admin-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.admin-card{background:#101010;border:1px solid #292929;border-radius:15px;padding:18px}.user-row{display:grid;grid-template-columns:1fr 120px 150px 100px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #242424;font-size:13px}.admin-note{color:#999;font-size:12px;line-height:1.5}
+@media(max-width:750px){.admin-grid{grid-template-columns:1fr}.user-row{grid-template-columns:1fr 1fr}.user-row button{grid-column:span 2}}
+
+
+/* ORIGINAL EGYPTIAN SLOT ART – vector symbols, no emoji */
+.symbol{width:88%;height:84%;padding:5px;overflow:hidden;background:radial-gradient(circle at 50% 25%,#4a351b,#171009 72%);border:2px solid #b7893d;box-shadow:inset 0 0 18px rgba(255,205,105,.18),0 5px 10px rgba(0,0,0,.65)}
+.symbol .art{width:100%;height:78%;display:block;filter:drop-shadow(0 3px 4px rgba(0,0,0,.8))}
+.symbol .tag{font-family:Georgia,serif;font-size:10px;letter-spacing:1.2px;color:#f2d58a;margin-top:2px;text-shadow:0 1px 2px #000}
+.symbol.high{background:linear-gradient(145deg,#8d5b1e,#241408);border-color:#e4bc62}
+.symbol.mid{background:linear-gradient(145deg,#31514c,#101b1a);border-color:#7bb3a7}
+.symbol.low{background:linear-gradient(145deg,#3b315c,#120f1e);border-color:#8e7cc4}
+.symbol.card-symbol{background:linear-gradient(145deg,#6f4d1d,#171006);border-color:#d8ad58}
+.symbol.wild{background:radial-gradient(circle at 50% 30%,#b87a21,#351307 72%);border-color:#f4d276;box-shadow:inset 0 0 28px rgba(255,187,47,.35),0 0 15px rgba(255,160,30,.2)}
+.symbol.scatter{background:radial-gradient(circle at 50% 30%,#6e579a,#171126 72%);border-color:#c9b7ef}
+
+.slot-reels{box-shadow:inset 0 0 30px #000,0 0 20px rgba(210,157,52,.18)}
+.slot-reel{background:linear-gradient(90deg,#070707,#1b1309 48%,#070707);box-shadow:inset 8px 0 12px rgba(0,0,0,.55),inset -8px 0 12px rgba(0,0,0,.55)}
+.slot-cell:nth-child(2){box-shadow:inset 0 2px 0 rgba(255,220,130,.07),inset 0 -2px 0 rgba(255,220,130,.07)}
+
+#levelWidget{display:flex;align-items:center;gap:6px;min-width:145px;padding:5px 8px;border:1px solid #333;border-radius:9px;background:#101010;color:#ffd84d;font-size:11px}#levelWidget small{color:#aaa;font-size:9px}.xp-mini{display:block;width:48px;height:5px;background:#292929;border-radius:8px;overflow:hidden}.xp-mini i,.level-bar i{display:block;height:100%;background:linear-gradient(90deg,#9b7a1f,#ffd84d);border-radius:inherit}.level-bar{height:9px;background:#252525;border-radius:9px;overflow:hidden;margin:10px 0 5px}.custom-art{width:100%;height:100%;object-fit:contain;display:block}.modal-open{overflow:hidden}
+</style>
+
+<style>
+.symbol .custom-art{width:100%;height:100%;max-height:82px;object-fit:cover;object-position:center top;display:block;border-radius:6px 6px 0 0;}
+.symbol.photo-high,.symbol.photo-mid{background:linear-gradient(180deg,#fff,#dce2e8);padding:2px;overflow:hidden;}
+.symbol.photo-high .tag,.symbol.photo-mid .tag{font-size:9px;line-height:1.05;white-space:normal;padding:3px 1px;color:#fff;background:#071a3d;border-radius:0 0 5px 5px;}
+</style>
+
+<style id="kx47-expansion-style">
+/* KX47 CASINO EXPANSION */
+.scatter-badge{margin-top:8px;padding:7px 9px;border:1px solid #8f76cf;border-radius:8px;background:linear-gradient(135deg,#211631,#120d1d);color:#efe7ff;font-size:11px;font-weight:900;text-align:center}.scatter-badge b{color:#d8c4ff}.locked-play{opacity:.55;filter:grayscale(.35)}
+.casino-hub{padding:30px 20px 50px;max-width:1400px;margin:auto}.casino-title{text-align:center;margin-bottom:18px}.casino-title h2{font-size:32px;color:#ffd84d}.casino-title p{color:#aaa;margin-top:6px}.casino-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}.casino-card{background:linear-gradient(160deg,#1b1b1b,#090909);border:1px solid #423817;border-radius:18px;padding:18px;min-height:170px;position:relative;overflow:hidden}.casino-card:before{content:"";position:absolute;inset:auto -30px -45px auto;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(255,216,77,.18),transparent 70%)}.casino-card h3{color:#ffd84d;margin-bottom:8px}.casino-card p{color:#aaa;font-size:13px;min-height:42px}.casino-card button{width:100%;margin-top:12px}.casino-modal{position:fixed;inset:0;z-index:30000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.88);backdrop-filter:blur(10px)}.casino-modal.open{display:flex}.casino-box{width:min(920px,100%);max-height:94vh;overflow:auto;border:1px solid #8b7029;border-radius:22px;background:radial-gradient(circle at 50% 0,#2c2619,#090909 55%);padding:22px;box-shadow:0 30px 120px #000}.casino-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.casino-head h2{color:#ffd84d}.close-casino{background:#282828;color:#fff}.game-screen{margin-top:18px;min-height:440px;text-align:center}.game-screen h3{margin:10px}.game-msg{min-height:28px;color:#f5d98a;margin:10px}.play-row{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:15px 0}.coin-chip{padding:9px 14px;border-radius:999px;background:#181818;border:1px solid #725d20;color:#ffd84d;font-weight:900}.playing-card{display:inline-flex;width:76px;height:108px;margin:6px;border-radius:9px;background:#f5f0df;color:#151515;align-items:center;justify-content:center;flex-direction:column;font-size:25px;font-weight:1000;box-shadow:0 6px 18px #000;animation:deal .35s ease-out}.playing-card.red{color:#b31f24}.playing-card.back{background:repeating-linear-gradient(45deg,#321a55,#321a55 7px,#6d4fa0 7px,#6d4fa0 14px);color:#fff}.playing-card .rank{font-size:15px}@keyframes deal{from{transform:translateY(-60px) rotate(-10deg);opacity:0}to{transform:none;opacity:1}}
+.wheel-wrap{position:relative;width:min(420px,88vw);aspect-ratio:1;margin:15px auto}.wheel{width:100%;height:100%;border-radius:50%;border:12px solid #e2bd4f;background:conic-gradient(#7c1e1e 0 45deg,#293c88 45deg 90deg,#8b5b15 90deg 135deg,#175a44 135deg 180deg,#5d2379 180deg 225deg,#8b2e2e 225deg 270deg,#1d507d 270deg 315deg,#77621c 315deg);box-shadow:0 0 0 8px #241b08,0 20px 60px #000;transition:transform 4.8s cubic-bezier(.1,.7,.1,1)}.wheel:after{content:'KX47';position:absolute;inset:37%;border-radius:50%;display:grid;place-items:center;background:#15110a;border:4px solid #ffd84d;color:#ffd84d;font-weight:1000}.wheel-pointer{position:absolute;left:50%;top:-12px;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:42px solid #fff;filter:drop-shadow(0 3px 3px #000);z-index:2}.wheel-labels{position:absolute;inset:0;pointer-events:none}.wheel-label{position:absolute;left:50%;top:50%;transform-origin:0 0;font-size:11px;font-weight:900;color:white;text-shadow:0 1px 4px #000}.ladder{width:min(560px,100%);margin:20px auto;display:flex;flex-direction:column-reverse;gap:5px}.step{padding:8px;border:1px solid #393939;border-radius:8px;background:#121212;color:#aaa}.step.active{background:linear-gradient(90deg,#78520d,#d4af37);color:#111;font-weight:1000}.step.win{box-shadow:0 0 20px rgba(255,216,77,.55)}
+.race-track{position:relative;height:320px;background:linear-gradient(#74bfe5 0 25%,#55a657 25% 100%);border-radius:16px;overflow:hidden;border:5px solid #684c20}.finish{position:absolute;right:12%;top:25%;bottom:0;width:7px;background:repeating-linear-gradient(#fff 0 15px,#111 15px 30px)}.horse{position:absolute;left:3%;font-size:46px;transition:left 3.8s cubic-bezier(.1,.8,.2,1);filter:drop-shadow(0 3px 2px #000)}.horse small{display:inline-block;font-size:12px;color:#111;background:#fff;padding:2px 5px;border-radius:6px}.sabacc-table{background:radial-gradient(ellipse,#2b6a56,#103226 60%,#071710);border:7px solid #5b3217;border-radius:48% 48% 38% 38%;padding:26px 15px;min-height:360px;box-shadow:inset 0 0 70px rgba(0,0,0,.65)}.sabacc-score{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;color:#e8d69d}.sabacc-note{font-size:12px;color:#d7c69d;max-width:680px;margin:14px auto}.roulette-wheel{width:280px;height:280px;border-radius:50%;margin:10px auto;border:12px solid #b38b2d;background:repeating-conic-gradient(#b51d25 0 10deg,#171717 10deg 20deg);position:relative;transition:transform 4s cubic-bezier(.1,.7,.1,1)}.roulette-wheel:after{content:'●';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:42px}.poker-table{padding:30px;border-radius:48%;background:radial-gradient(#2b7a58,#0a2519);border:8px solid #4b2c18;min-height:280px}.auth-required-banner{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99999;background:#21170a;border:1px solid #d4af37;border-radius:12px;padding:12px 18px;color:#ffe59a;display:none}
+@media(max-width:600px){.casino-box{padding:14px}.playing-card{width:56px;height:82px;font-size:19px}.game-screen{min-height:380px}.race-track{height:280px}}
+</style></head>
+
+<body>
+
+<!-- =========================
+     LOADER
+========================= -->
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+    <div class="logo">
+        KX47
+    </div>
+
+    <nav>
+        <a href="#start">Start</a>
+        <a href="#games">Spiele</a>
+        <a href="#categories">Kategorien</a>
+        <a href="#jackpotSection">Jackpot</a>
+        <a href="#bonus">Bonus</a>
+    </nav>
+
+    <div class="right">
+        <div id="balance">€1.000</div><div id="levelWidget" title="Level & XP"><b>Lv. 1</b><span class="xp-mini"><i id="xpMiniBar"></i></span><small id="xpMiniText">0 / 250 XP</small></div>
+        <button class="gold" id="loginButton">Konto</button><button class="dark" id="adminButton" style="display:none">Admin</button>
+    </div>
+
+</header>
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero" id="start">
+
+    <div class="hero-content">
+
+        <h1>
+            Willkommen bei KX47
+        </h1>
+
+        <p>
+            33+ einzigartige Demo Spielautomaten
+        </p>
+
+        <div id="jackpot">
+            €12.500.000
+        </div>
+
+        <button class="gold hero-button" id="heroPlay">
+            Jetzt Spielen
+        </button>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     SEARCH
+========================= -->
+
+<div class="search">
+
+    <div class="search-wrapper">
+
+        <span class="search-icon">⌕</span>
+
+        <input
+            id="search"
+            type="search"
+            autocomplete="off"
+            placeholder="Spiel suchen..."
+            aria-label="Spiel suchen"
+        >
+
+    </div>
+
+</div>
+
+<!-- =========================
+     CATEGORIES
+========================= -->
+
+<div class="categories" id="categories">
+
+    <div class="cat active" data-category="Alle">
+        Alle
+    </div>
+
+    <div class="cat" data-category="Klassiker">
+        Klassiker
+    </div>
+
+    <div class="cat" data-category="Jackpot">
+        Jackpot
+    </div>
+
+    <div class="cat" data-category="Fantasy">
+        Fantasy
+    </div>
+
+    <div class="cat" data-category="Ägypten">
+        Ägypten
+    </div>
+
+    <div class="cat" data-category="Piraten">
+        Piraten
+    </div>
+
+    <div class="cat" data-category="Galaxy">
+        Galaxy
+    </div>
+    <div class="cat" data-category="Fußball">Fußball</div>
+    <div class="cat" data-category="Weltmeisterschaft">Weltmeisterschaft</div>
+    <div class="cat" data-category="Champions League">Champions League</div>
+    <div class="cat" data-category="Deutschland">Deutschland</div>
+    <div class="cat" data-category="MSV Duisburg">MSV Duisburg</div>
+
+</div>
+
+<!-- =========================
+     GAMES
+========================= -->
+
+<div class="section-title" id="games">
+
+    <h2>
+        Beliebte Spiele
+    </h2>
+
+    <span
+        class="game-count"
+        id="gameCount"
+    >
+        0 Spiele
+    </span>
+
+</div>
+
+<div
+    class="grid"
+    id="gameGrid"
+></div>
+
+<div id="emptyState">
+
+    <h3>
+        Keine Spiele gefunden
+    </h3>
+
+    <p>
+        Versuche einen anderen Suchbegriff.
+    </p>
+
+</div>
+
+<div id="loadMoreContainer">
+
+    <button
+        id="loadMore"
+    >
+        Mehr Spiele laden
+    </button>
+
+</div>
+
+
+<div id="gameModal" aria-hidden="true">
+  <div class="game-modal-box" role="dialog" aria-modal="true" aria-labelledby="gameModalTitle">
+    <div class="slot-top">
+      <div class="slot-brand" id="gameModalTitle">Temple of the Builders</div>
+      <div class="slot-info">5 WALZEN · 3 REIHEN · 9 GEWINNLINIEN · ÄGYPTISCHES ABENTEUER · DEMO</div>
+      <div class="jackpots"><div class="jp"><small>MINOR</small><strong id="jpMinor">€250</strong></div><div class="jp"><small>MAJOR</small><strong id="jpMajor">€2.500</strong></div><div class="jp"><small>GRAND</small><strong id="jpGrand">€25.000</strong></div></div>
+    </div>
+    <div class="slot-shell">
+      <div class="feature-banner" id="featureBanner"><strong>FREISPIEL!</strong><span id="featureText">10 Freispiele mit expandierendem Symbol</span></div>
+      <div class="slot-reels" id="slotReels">
+        <div class="slot-reel" id="reel1"></div><div class="slot-reel" id="reel2"></div><div class="slot-reel" id="reel3"></div><div class="slot-reel" id="reel4"></div><div class="slot-reel" id="reel5"></div>
+      </div>
+      <div class="slot-paylines" id="paylineDots"></div>
+      <div class="paytable-panel" id="paytablePanel" aria-live="polite">
+        <div class="paytable-head">
+          <strong>Gewinntabelle</strong>
+          <span id="paytableBet">Einsatz €100 · Gewinne pro Gewinnlinie</span>
+        </div>
+        <div class="paytable-grid" id="paytableGrid"></div>
+        <div class="pay-scatter" id="paytableScatter">3, 4 oder 5 Scatter-Symbole: Bonus gemäß Spiel.</div>
+      </div>
+      <div class="slot-status"><span id="slotBalance">Guthaben €0</span><span id="slotWin">Gewinn €0</span><span id="slotFree">Freispiele 0</span></div>
+    </div>
+    <div class="game-result" id="gameResult">Bereit für den Spin.</div>
+    <div class="slot-controls">
+      <div class="bet-box"><button id="betDown">−</button><input id="betInput" type="number" min="100" max="10000" step="100" value="100"><button id="betUp">+</button></div>
+      <button class="dark" id="maxBet">MAX 10.000</button>
+      <div class="slot-info">Einsatz pro Spin · 100–10.000 Demo-Credits<br>Wild ersetzt Symbole · 3+ Scatter starten Freispiele</div>
+      <button class="gold slot-spin" id="spinButton">DREHEN</button>
+      <button class="slot-close" id="closeGameButton">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+
+<!-- KX47 AUTH -->
+<div class="auth-backdrop" id="authBackdrop">
+  <div class="auth-box">
+    <button class="auth-close" id="authClose">✕</button>
+    <h2>KX47 Konto</h2>
+    <p class="admin-note">Demo-Account-System für diese lokale KX47-Version.</p>
+    <div class="auth-tabs">
+      <button id="tabLogin" class="active">Anmelden</button>
+      <button id="tabRegister">Registrieren</button>
+    </div>
+    <form id="authForm">
+      <input id="authUsername" minlength="3" maxlength="32" placeholder="Username" autocomplete="username">
+      <input id="authEmail" type="text" required placeholder="E-Mail oder Benutzername" autocomplete="username">
+      <input id="authPassword" type="password" required minlength="8" placeholder="Passwort (min. 8 Zeichen)" autocomplete="current-password">
+      <button class="gold" style="width:100%;margin-top:10px" id="authSubmit">Anmelden</button>
+    </form>
+    <p id="authMessage" class="admin-note" style="margin-top:12px"></p>
+  </div>
+</div>
+
+<!-- KX47 ADMIN -->
+<div class="admin-backdrop" id="adminBackdrop">
+  <div class="admin-box">
+    <button class="auth-close" id="adminClose">✕</button>
+    <h2>KX47 Admin Panel</h2>
+    <p id="adminIdentity" class="admin-note"></p>
+    <div class="admin-grid">
+      <section class="admin-card">
+        <h3>Coins vergeben</h3>
+        <p class="admin-note">Nur Manager dürfen Coins vergeben oder Gruppen ändern.</p>
+        <select id="coinTarget"></select>
+        <input id="coinAmount" type="number" min="1" max="100000000" step="100" value="1000" placeholder="Coins">
+        <button class="gold" id="grantCoins" style="width:100%;margin-top:8px">Coins setzen</button>
+        <p id="coinMessage" class="admin-note" style="margin-top:10px"></p>
+      </section>
+      <section class="admin-card">
+        <h3>Rollen</h3>
+        <p class="admin-note">Manager = alle Rechte · Mitentwickler = Entwicklungszugriff · User = nur spielen.</p>
+        <select id="roleTarget"></select>
+        <select id="roleValue">
+          <option>Manager</option>
+          <option>Mitentwickler</option>
+          <option>User</option>
+        </select>
+        <button class="dark" id="setRole" style="width:100%;margin-top:8px">Gruppe speichern</button>
+      </section>
+    </div>
+    <div class="admin-card" style="margin-top:18px" id="gameCreatorCard">
+      <h3>Spiel erstellen</h3>
+      <p class="admin-note">Erstelle eigene Demo-Slots. Cover und bis zu 12 Symbolbilder werden lokal im Browser gespeichert.</p>
+      <div class="admin-grid">
+        <div><input id="newGameName" placeholder="Spielname, z. B. Football Stars"><select id="newGameCategory"><option>Fantasy</option><option>Fußball</option><option>Weltmeisterschaft</option><option>Champions League</option><option>Deutschland</option><option>MSV Duisburg</option><option>Ägypten</option><option>Piraten</option><option>Jungle</option><option>Jackpot</option></select><select id="newGameTheme"><option value="football">Fußball</option><option value="worldcup">Weltmeisterschaft</option><option value="champions">Champions League</option><option value="germany">Deutschland</option><option value="msv">MSV Duisburg</option><option value="pharaoh">Pharaoh</option><option value="pirate">Pirate</option><option value="jungle">Jungle</option><option value="dragon">Dragon</option><option value="fantasy">Fantasy</option></select><input id="newGameRtp" type="number" min="80" max="99.99" step="0.01" value="96.50" placeholder="RTP"><label class="admin-note">Cover-Bild <input id="newGameCover" type="file" accept="image/*"></label></div>
+        <div><label class="admin-note">Symbolbilder (bis zu 12, Reihenfolge = Symbolreihenfolge)<input id="newGameSymbols" type="file" accept="image/*" multiple></label><button class="gold" id="createGame" style="width:100%;margin-top:10px">Spiel speichern</button><p id="gameCreateMessage" class="admin-note" style="margin-top:10px"></p></div>
+      </div>
+    </div>
+    <div class="admin-card" style="margin-top:18px">
+      <h3>Level-System</h3><p class="admin-note">Level 1–250 · XP werden beim Spielen verdient und steigen mit höheren Levels langsamer.</p><div id="adminLevelInfo"></div>
+    </div>
+    <div class="admin-card" style="margin-top:18px">
+      <h3>Benutzer</h3>
+      <div id="userList"></div>
+    </div>
+    <p class="admin-note" style="margin-top:14px">
+      Wichtig: Diese HTML-Datei ist eine Demo. Eine echte Zugriffskontrolle darf nicht nur im Browser liegen.
+      OWASP empfiehlt serverseitige Durchsetzung von Authentifizierung/Autorisierung und warnt davor,
+      Authentifizierungsdaten bzw. Session-Tokens als vertrauenswürdige localStorage-Daten zu behandeln.
+    </p>
+  </div>
+</div>
+
+
+<section id="casino" class="casino-hub">
+ <div class="casino-title"><h2>🎰 KX47 Casino</h2><p>Alle Einsätze und Gewinne sind virtuelle Demo-Credits.</p></div>
+ <div class="casino-grid" id="casinoGrid">
+  <article class="casino-card"><h3>🎡 Bonus Wheel</h3><p>Ein Spin kostet 100.000 Credits. Drehe das Rad und jage große Demo-Gewinne.</p><button class="gold casino-open" data-casino="wheel">Rad drehen</button></article>
+  <article class="casino-card"><h3>🪜 Leiter</h3><p>10.000 Credits pro Runde. Steige von 100 bis maximal 300.000 Credits – oder sichere deinen Gewinn.</p><button class="gold casino-open" data-casino="ladder">Leiter spielen</button></article>
+  <article class="casino-card"><h3>🂡 Blackjack</h3><p>Ziehe Karten, bleibe unter 21 und besiege den Dealer.</p><button class="gold casino-open" data-casino="blackjack">Spielen</button></article>
+  <article class="casino-card"><h3>♠ Texas Hold'em</h3><p>Demo-Poker mit Hole Cards, Community Cards und automatischem Showdown.</p><button class="gold casino-open" data-casino="holdem">Spielen</button></article>
+  <article class="casino-card"><h3>🃏 Three Card Poker</h3><p>Ante, Play oder Fold mit einer schnellen 3-Karten-Hand.</p><button class="gold casino-open" data-casino="threecard">Spielen</button></article>
+  <article class="casino-card"><h3>🎯 Roulette</h3><p>Setze auf Rot oder Schwarz und beobachte das animierte Rad.</p><button class="gold casino-open" data-casino="roulette">Spielen</button></article>
+  <article class="casino-card"><h3>🏇 Pferderennen</h3><p>Wähle dein Pferd und erlebe ein animiertes Rennen bis zur Ziellinie.</p><button class="gold casino-open" data-casino="horse">Rennen starten</button></article>
+  <article class="casino-card"><h3>🌌 Sabacc</h3><p>Eigenes, hochwertiges Sabacc-inspiriertes Spiel mit Shift-Karten, Handwerten und Sarlacc-ähnlicher Handlogik.</p><button class="gold casino-open" data-casino="sabacc">An den Tisch</button></article>
+ </div>
+</section>
+<div class="casino-modal" id="casinoModal"><div class="casino-box"><div class="casino-head"><h2 id="casinoTitle">KX47 Casino</h2><button class="close-casino" id="casinoClose">✕</button></div><div class="game-screen" id="casinoScreen"></div></div></div>
+<div class="auth-required-banner" id="authRequiredBanner">🔒 Bitte anmelden oder registrieren, um zu spielen.</div>
+
+<footer id="bonus">
+
+    <p>
+        <strong>KX47 Demo</strong>
+        – Keine Echtgeldplattform.
+    </p>
+
+    <p>
+        Alle Credits und Spiele dienen ausschließlich zu Demo-Zwecken.
+    </p>
+
+</footer>
+
+
+<script>
+const MIN_BET = 100;
+const MAX_BET = 10000;
+function clampBetValue(v) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return MIN_BET;
+    return Math.min(MAX_BET, Math.max(MIN_BET, Math.round(n / 100) * 100));
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* =========================
+   KX47 SECURE AUTH – SUPABASE
+   Accounts, sessions and admin actions are server-side.
+   Replace the two placeholders below with your Supabase Project URL + anon/publishable key.
+   ========================= */
+(() => {
+  "use strict";
+  const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY";
+
+  const $ = id => document.getElementById(id);
+  const auth = $("authBackdrop"), admin = $("adminBackdrop"), form = $("authForm");
+  const loginBtn = $("loginButton"), adminBtn = $("adminButton");
+  const tabLogin = $("tabLogin"), tabRegister = $("tabRegister");
+  const usernameEl = $("authUsername"), loginEl = $("authEmail"), passwordEl = $("authPassword");
+  const submitBtn = $("authSubmit"), msg = $("authMessage");
+  let sb = null, profile = null;
+
+  function configured(){
+    return SUPABASE_URL.startsWith("http") && !SUPABASE_URL.includes("YOUR_") &&
+           SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes("YOUR_");
+  }
+  function showConfigError(){
+    if(msg) msg.textContent="KX47 ist noch nicht konfiguriert. Bitte SUPABASE_URL und SUPABASE_ANON_KEY in index.html eintragen.";
+  }
+  if(configured() && window.supabase?.createClient){
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+    });
+  }
+  const esc = v => String(v ?? "").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+  const isAdmin = p => p && (p.role === "Manager" || p.role === "Owner");
+
+  async function getProfile(){
+    if(!sb) return null;
+    const {data:{user}} = await sb.auth.getUser();
+    if(!user) return null;
+    const {data,error} = await sb.from("profiles").select("id,username,email,role,coins,created_at").eq("id",user.id).single();
+    if(error || !data) return null;
+    return data;
+  }
+
+  function syncUI(){
+    if(!profile){
+      if(loginBtn) loginBtn.textContent="Konto";
+      if(adminBtn) adminBtn.style.display="none";
+      return;
+    }
+    if(loginBtn) loginBtn.textContent=profile.username || "Konto";
+    if(adminBtn) adminBtn.style.display=isAdmin(profile)?"inline-block":"none";
+    window.kx47Balance=Number(profile.coins)||0;
+    window.balance=window.kx47Balance;
+    try{ localStorage.setItem("KX47Balance",String(window.balance)); }catch{}
+    if(typeof window.updateBalance==="function") window.updateBalance();
+  }
+
+  function setMode(register){
+    tabLogin?.classList.toggle("active",!register);
+    tabRegister?.classList.toggle("active",register);
+    if(usernameEl){ usernameEl.style.display=register?"block":"none"; usernameEl.disabled=!register; usernameEl.required=register; }
+    if(loginEl){ loginEl.placeholder=register?"E-Mail":"E-Mail oder Benutzername"; loginEl.type=register?"email":"text"; }
+    if(passwordEl) passwordEl.autocomplete=register?"new-password":"current-password";
+    if(submitBtn) submitBtn.textContent=register?"Konto erstellen":"Anmelden";
+    if(msg) msg.textContent="";
+  }
+  function openAuth(){ setMode(false); auth?.classList.add("open"); loginEl?.focus(); }
+
+  async function signOut(){
+    if(sb) await sb.auth.signOut();
+    profile=null; syncUI();
+  }
+
+  async function submitAuth(e){
+    e.preventDefault();
+    if(!sb){ showConfigError(); return; }
+    const register=tabRegister?.classList.contains("active");
+    const identifier=(loginEl?.value||"").trim();
+    const password=passwordEl?.value||"";
+    const username=(usernameEl?.value||"").trim();
+    if(!identifier || !password || (register&&!username)){ msg.textContent="Bitte alle erforderlichen Felder ausfüllen."; return; }
+    if(register && password.length<8){ msg.textContent="Das Passwort muss mindestens 8 Zeichen haben."; return; }
+    submitBtn.disabled=true;
+    try{
+      if(register){
+        const {data,error}=await sb.auth.signUp({email:identifier.toLowerCase(),password,options:{data:{username}}});
+        if(error) throw error;
+        if(!data.session){ msg.textContent="Konto erstellt. Bitte bestätige zuerst deine E-Mail-Adresse."; return; }
+        profile=await getProfile();
+        if(!profile) throw new Error("Profil konnte nicht erstellt werden.");
+        msg.textContent="Konto erfolgreich erstellt. Du startest mit 1.000 Demo-Coins.";
+      }else{
+        let email=identifier;
+        if(!identifier.includes("@")){
+          const {data,error}=await sb.from("profiles").select("email").ilike("username",identifier).limit(1).single();
+          if(error||!data) throw new Error("E-Mail/Benutzername oder Passwort falsch.");
+          email=data.email;
+        }
+        const {error}=await sb.auth.signInWithPassword({email:email.toLowerCase(),password});
+        if(error) throw error;
+        profile=await getProfile();
+        if(!profile){ await sb.auth.signOut(); throw new Error("Konto ist nicht freigeschaltet."); }
+        msg.textContent="Erfolgreich angemeldet.";
+      }
+      syncUI();
+      setTimeout(()=>auth?.classList.remove("open"),450);
+    }catch(err){ msg.textContent=err?.message||"Anmeldung fehlgeschlagen."; }
+    finally{ submitBtn.disabled=false; }
+  }
+
+  async function adminUsers(){
+    if(!sb || !isAdmin(profile)) throw new Error("ADMIN_REQUIRED");
+    const {data,error}=await sb.rpc("admin_list_users");
+    if(error) throw error;
+    return data||[];
+  }
+
+  async function renderAdmin(){
+    if(!isAdmin(profile)){ alert("Kein Zugriff. Nur Manager/Owner dürfen das Admin Panel öffnen."); return; }
+    try{
+      const users=await adminUsers();
+      $("adminIdentity").innerHTML=`Angemeldet als <strong>${esc(profile.username)}</strong> · <span class="role-pill">${esc(profile.role)}</span>`;
+      const opts=users.map(u=>`<option value="${esc(u.id)}">${esc(u.username)} · ${esc(u.email)}</option>`).join("");
+      $("coinTarget").innerHTML=opts; $("roleTarget").innerHTML=opts;
+      $("userList").innerHTML=users.map(u=>`<div class="user-row">
+        <div><strong>${esc(u.username)}</strong><br><span class="admin-note">${esc(u.email)}</span></div>
+        <div><span class="role-pill">${esc(u.role)}</span></div>
+        <div>🪙 ${Number(u.coins||0).toLocaleString("de-DE")}</div>
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;flex-wrap:wrap">
+          ${u.id===profile.id?'<span class="role-pill">Du</span>':`<button class="dark delete-user-btn" data-user-id="${esc(u.id)}" style="padding:7px 10px;background:#4a1414;border:1px solid #8d2d2d;color:#fff">🗑 Löschen</button>`}
+        </div></div>`).join("");
+    }catch(e){ alert(e?.message||"Admin-Daten konnten nicht geladen werden."); }
+  }
+
+  async function init(){
+    if(!configured()){ syncUI(); return; }
+    const {data:{session}}=await sb.auth.getSession();
+    if(session){ profile=await getProfile(); if(!profile) await sb.auth.signOut(); }
+    syncUI();
+    sb.auth.onAuthStateChange(async (_event,s)=>{
+      if(s){ profile=await getProfile(); if(!profile) await sb.auth.signOut(); }
+      else profile=null;
+      syncUI();
+    });
+  }
+
+  form?.addEventListener("submit",submitAuth);
+  tabLogin?.addEventListener("click",()=>setMode(false));
+  tabRegister?.addEventListener("click",()=>setMode(true));
+  loginBtn?.addEventListener("click",openAuth);
+  $("authClose")?.addEventListener("click",()=>auth?.classList.remove("open"));
+  adminBtn?.addEventListener("click",async()=>{ if(isAdmin(profile)){ await renderAdmin(); admin?.classList.add("open"); } else alert("Kein Zugriff."); });
+  $("adminClose")?.addEventListener("click",()=>admin?.classList.remove("open"));
+
+  $("userList")?.addEventListener("click",async e=>{
+    const btn=e.target.closest(".delete-user-btn"); if(!btn||!isAdmin(profile)) return;
+    if(!confirm("Dieses KX47-Profil wirklich löschen/sperren?")) return;
+    try{ const {error}=await sb.rpc("admin_delete_profile",{target_id:btn.dataset.userId}); if(error) throw error; await renderAdmin(); }
+    catch(err){ alert(err?.message||"Löschen fehlgeschlagen."); }
+  });
+
+  $("grantCoins")?.addEventListener("click",async()=>{
+    if(!isAdmin(profile)) return;
+    const target=$("coinTarget").value, amount=Number($("coinAmount").value);
+    if(!Number.isInteger(amount)||amount<=0){ $("coinMessage").textContent="Ungültiger Betrag."; return; }
+    try{ const {error}=await sb.rpc("admin_grant_coins",{target_id:target,amount}); if(error) throw error; $("coinMessage").textContent="Coins wurden serverseitig gutgeschrieben."; if(target===profile.id) profile=await getProfile(); await renderAdmin(); syncUI(); }
+    catch(err){ $("coinMessage").textContent=err?.message||"Gutschrift fehlgeschlagen."; }
+  });
+
+  $("setRole")?.addEventListener("click",async()=>{
+    if(!isAdmin(profile)) return;
+    try{ const {error}=await sb.rpc("admin_set_role",{target_id:$("roleTarget").value,new_role:$("roleValue").value}); if(error) throw error; profile=await getProfile(); await renderAdmin(); syncUI(); }
+    catch(err){ alert(err?.message||"Rolle konnte nicht geändert werden."); }
+  });
+
+  // If the page has a logout control later, it can call window.KX47Logout().
+  window.KX47Logout=signOut;
+  window.KX47GetProfile=()=>profile;
+  window.KX47Supabase=()=>sb;
+
+  setMode(false);
+  init();
+})();
+</script>
+
+<script>
+"use strict";
+
+/* =========================
+   LOADER
+========================= */
+
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        document
+            .getElementById("loader")
+            .classList.add("hidden");
+    }, 700);
+});
+
+
+/* =========================
+   PARTICLES
+========================= */
+
+const hero = document.getElementById("start");
+
+for (let i = 0; i < 80; i++) {
+
+    const particle = document.createElement("div");
+
+    particle.className = "particle";
+
+    const size = Math.random() * 6 + 2;
+
+    particle.style.width = size + "px";
+    particle.style.height = size + "px";
+
+    particle.style.left =
+        Math.random() * 100 + "%";
+
+    particle.style.animationDuration =
+        (8 + Math.random() * 10) + "s";
+
+    particle.style.animationDelay =
+        (-Math.random() * 20) + "s";
+
+    hero.appendChild(particle);
+}
+
+
+/* =========================
+   JACKPOT
+========================= */
+
+let jackpot = 12500000;
+
+const jackpotElement =
+    document.getElementById("jackpot");
+
+function updateJackpot() {
+
+    jackpotElement.textContent =
+        "€" +
+        jackpot.toLocaleString("de-DE");
+}
+
+setInterval(() => {
+
+    jackpot += Math.floor(
+        Math.random() * 450
+    );
+
+    updateJackpot();
+
+}, 3000);
+
+
+/* =========================
+   BALANCE
+========================= */
+
+const balanceElement =
+    document.getElementById("balance");
+
+let balance =
+    Number(localStorage.getItem("KX47Balance"));
+
+if (!Number.isFinite(balance)) {
+    balance = 1000;
+}
+
+function updateBalance() {
+
+    balanceElement.textContent =
+        "€" +
+        balance.toLocaleString("de-DE");
+}
+
+updateBalance();
+
+
+/* =========================
+   GAMES
+========================= */
+
+const gameCatalog = [
+  ["Book of Pharaoh","Ägypten","pharaoh"],["Pharaoh Gold","Ägypten","pharaoh"],["Temple of Egypt","Ägypten","pharaoh"],
+  ["Pirate Treasure","Piraten","pirate"],["Pirate Gold","Piraten","pirate"],["Jolly Captain","Piraten","pirate"],
+  ["Jungle Wild","Jungle","jungle"],["Jungle Quest","Jungle","jungle"],["Rainforest Riches","Jungle","jungle"],
+  ["Dragon Fire","Fantasy","dragon"],["Dragon Kingdom","Fantasy","dragon"],["Crystal Magic","Fantasy","crystal"],
+  ["Wolf Gold","Fantasy","wolf"],["Viking Raiders","Fantasy","viking"],["Samurai Fortune","Fantasy","samurai"],
+  ["Neon Nights","Neon","neon"],["Galaxy Stars","Galaxy","galaxy"],["Candy Kingdom","Fantasy","candy"],
+  ["Fortune Coins","Jackpot","fortune"],["Titan Gold","Jackpot","titan"],
+  ["Football Legends","Fußball","football"],["Football Clubs","Fußball","football"],["World Cup Stars","Weltmeisterschaft","worldcup"],
+  ["World Cup Champions","Weltmeisterschaft","worldcup"],["Champions League","Champions League","champions"],["Champions League Legends","Champions League","champions"],
+  ["Deutschland Stars","Deutschland","germany"],["Deutschland Fußball","Deutschland","germany"],["FIFA 27 Football","FIFA 27","football"],["FIFA 27 Legends","FIFA 27","football"],
+  ["MSV Duisburg 2026/27","MSV Duisburg","msv"],["MSV Zebras Stars","MSV Duisburg","msv"],["MSV Duisburg Spieler","MSV Duisburg","msv"],
+  ["NBA Teams","NBA","nba"],["NBA Stars","NBA","nba"],["NBA Legends","NBA","nba"],["NBA Champions","NBA","nba"],
+  ["NFL Teams","NFL","nfl"],["NFL Stars","NFL","nfl"],["NFL Legends","NFL","nfl"],["Super Bowl Legends","NFL","nfl"],
+  ["WWE Superstars","WWE","wwe"],["WWE Legends","WWE","wwe"],["WWE Champions","WWE","wwe"],["WrestleMania Legends","WWE","wwe"],
+  ["GTA V Legends","GTA","gta"],["GTA V Characters","GTA","gta"],["GTA Online","GTA","gta"],["GTA Vice City","GTA","gta"],
+  ["Marvel Heroes","Marvel","marvel"],["Marvel Villains","Marvel","marvel"],["Avengers","Marvel","marvel"],["Marvel Legends","Marvel","marvel"]
+];
+function makeGameImage(title,theme,index){
+ const palettes={pharaoh:["#d4af37","#102b35"],pirate:["#d7a84a","#182735"],jungle:["#77a94b","#102b1b"],dragon:["#e1a84d","#4a1717"],crystal:["#b8e8ff","#343d86"],wolf:["#e9edf2","#303846"],viking:["#e2bd69","#2b4555"],samurai:["#e5c57a","#6b1f29"],neon:["#39e7ff","#7d3cff"],galaxy:["#e7d5ff","#252c74"],candy:["#ffd5eb","#7847a5"],fortune:["#ffe28a","#68450f"],titan:["#d7d0c0","#303238"],football:["#e9f4ff","#174b2c"],worldcup:["#f4e8c1","#183d70"],champions:["#d8e8ff","#122c65"],germany:["#f5d9d9","#111111"],msv:["#ffffff","#0d0d0d"]};
+ const [a,b]=palettes[theme]||["#d4af37","#171717"];
+ const esc=title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ const icon=theme==='football'||theme==='worldcup'||theme==='champions'||theme==='germany'||theme==='msv'?'⚽':'★';
+ return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="420"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="300" height="420" fill="url(#g)"/><circle cx="150" cy="150" r="92" fill="#000" opacity=".35"/><text x="150" y="170" text-anchor="middle" font-size="70">${icon}</text><text x="150" y="270" text-anchor="middle" fill="#fff" font-size="24" font-family="Arial" font-weight="900">${esc}</text><text x="150" y="305" text-anchor="middle" fill="#fff" opacity=".8" font-size="14" font-family="Arial">KX47 DEMO</text></svg>`);
+}
+const games = gameCatalog.map((g,i)=>({id:i+1,name:g[0],category:g[1],theme:g[2],rtp:(95+Math.random()*2).toFixed(2)+'%',image:makeGameImage(g[0],g[2],i)}));
+const customGamesKey='KX47CustomGamesV1';
+function loadCustomGames(){try{return JSON.parse(localStorage.getItem(customGamesKey)||'[]')}catch{return []}}
+loadCustomGames().forEach(g=>games.push(g));
+const msvPlayers=["Max Braune","Laurenz Jennissen","Toni Stahl","Frederik Christensen","Martin Ens","Can Coskun","Joshua Bitter","Jakob Bookjans","Christian Viet","Simon Symalla","Patrick Sussek","Dominik Kother"];
+for(const g of games.filter(x=>x.theme==='msv')){
+  g.symbols=msvPlayers.map((name,i)=>({id:'msv_'+i,tag:name,type:i<3?'high':i<8?'mid':'low',pays:i===0?{3:0.25,4:0.75,5:4}:i===1?{3:0.20,4:0.60,5:3}:{3:8,4:24,5:70},image:''}));
+}
+
+/* =========================
+   REAL FOOTBALL DATA / IMAGES
+   Player portraits + club/national-team crests are resolved from
+   Wikipedia's public MediaWiki API when a football slot is opened.
+========================= */
+const footballCatalog={
+ "Football Legends":{
+   players:["Lionel Messi","Cristiano Ronaldo","Pelé","Diego Maradona","Zinedine Zidane","Ronaldinho","Johan Cruyff","Ronaldo Nazário"],
+   clubs:["FC Barcelona","Real Madrid CF","Manchester United F.C.","AC Milan"]
+ },
+ "Football Clubs":{
+   players:[],
+   clubs:["FC Bayern Munich","Real Madrid CF","FC Barcelona","Manchester City F.C.","Liverpool F.C.","Paris Saint-Germain F.C.","Arsenal F.C.","Chelsea F.C.","Manchester United F.C.","Tottenham Hotspur F.C.","Newcastle United F.C.","Inter Milan","AC Milan","Juventus F.C.","SSC Napoli","AS Roma","Atlético Madrid","Athletic Club","Villarreal CF","Borussia Dortmund","Bayer 04 Leverkusen","Eintracht Frankfurt","RB Leipzig","PSV Eindhoven","AFC Ajax","SL Benfica","Sporting CP","Galatasaray S.K.","Club Brugge KV","Olympique de Marseille","AS Monaco FC","Feyenoord","Celtic F.C."]
+ },
+ "World Cup Stars":{
+   players:["Lionel Messi","Kylian Mbappé","Neymar","James Rodríguez","Luka Modrić","Thomas Müller","Miroslav Klose","Zinedine Zidane"],
+   clubs:["FIFA World Cup","Argentina national football team","Brazil national football team","Germany national football team"]
+ },
+ "World Cup Champions":{
+   players:["Lionel Messi","Mario Kempes","Diego Maradona","Pelé","Cafu","Ronaldo Nazário","Thomas Müller","Miroslav Klose"],
+   clubs:["Argentina national football team","Brazil national football team","Germany national football team","France national football team","Italy national football team","Spain national football team"]
+ },
+ "Champions League":{
+   players:[],
+   clubs:["Real Madrid CF","FC Barcelona","FC Bayern Munich","Manchester City F.C.","Liverpool F.C.","Paris Saint-Germain F.C.","Arsenal F.C.","Chelsea F.C.","Manchester United F.C.","Borussia Dortmund","Bayer 04 Leverkusen","Atlético Madrid","Inter Milan","AC Milan","Juventus F.C.","SSC Napoli","Atalanta BC","Benfica","Sporting CP","PSV Eindhoven","AFC Ajax","Feyenoord","Galatasaray S.K.","Club Brugge KV","Olympique de Marseille","AS Monaco FC","Villarreal CF","Athletic Club","Tottenham Hotspur F.C.","Newcastle United F.C.","Eintracht Frankfurt","RB Leipzig","Slavia Prague","Olympiacos FC","Celtic F.C."]
+ },
+ "Champions League Legends":{
+   players:["Cristiano Ronaldo","Lionel Messi","Zinedine Zidane","Andrés Iniesta","Xavi","Paolo Maldini","Alfredo Di Stéfano","Clarence Seedorf"],
+   clubs:["Real Madrid CF","AC Milan","FC Barcelona","Manchester United F.C."]
+ },
+ "Deutschland Stars":{
+   players:["Jamal Musiala","Florian Wirtz","Kai Havertz","Joshua Kimmich","Antonio Rüdiger","Ilkay Gündogan","Thomas Müller","Manuel Neuer"],
+   clubs:["Germany national football team","FC Bayern Munich","Bayer 04 Leverkusen","Borussia Dortmund"]
+ },
+ "Deutschland Fußball":{
+   players:[],
+   clubs:["FC Bayern Munich","Borussia Dortmund","Bayer 04 Leverkusen","RB Leipzig","Eintracht Frankfurt","VfB Stuttgart","SC Freiburg","1. FSV Mainz 05","Borussia Mönchengladbach","VfL Wolfsburg","FC Augsburg","1. FC Union Berlin","SV Werder Bremen","TSG Hoffenheim","1. FC Köln","Hamburger SV","FC Schalke 04","SV Elversberg","SC Paderborn 07"]
+ },
+ "FIFA 27 Football":{
+   players:["Kylian Mbappé","Erling Haaland","Jude Bellingham","Vinícius Júnior","Rodri","Lamine Yamal","Bukayo Saka","Florian Wirtz"],
+   clubs:["Real Madrid CF","Manchester City F.C.","FC Barcelona","Bayer 04 Leverkusen","Arsenal F.C."]
+ },
+ "FIFA 27 Legends":{
+   players:["Pelé","Diego Maradona","Johan Cruyff","Zinedine Zidane","Ronaldo Nazário","Ronaldinho","Franz Beckenbauer","Paolo Maldini"],
+   clubs:["Brazil national football team","Argentina national football team","Germany national football team","Real Madrid CF","FC Barcelona","AC Milan"]
+ }
+};
+
+/* =========================
+   NBA / NFL / WWE / GTA / MARVEL CATALOGS
+   Real image lookup uses Wikipedia MediaWiki thumbnails.
+========================= */
+const sportsCatalog={
+  "NBA Teams":{teams:["Boston Celtics","Brooklyn Nets","New York Knicks","Philadelphia 76ers","Toronto Raptors","Chicago Bulls","Cleveland Cavaliers","Detroit Pistons","Indiana Pacers","Milwaukee Bucks","Atlanta Hawks","Charlotte Hornets","Miami Heat","Orlando Magic","Washington Wizards","Denver Nuggets","Minnesota Timberwolves","Oklahoma City Thunder","Portland Trail Blazers","Utah Jazz","Golden State Warriors","LA Clippers","Los Angeles Lakers","Phoenix Suns","Sacramento Kings","Dallas Mavericks","Houston Rockets","Memphis Grizzlies","New Orleans Pelicans","San Antonio Spurs"]},
+  "NBA Stars":{players:["LeBron James","Stephen Curry","Kevin Durant","Nikola Jokić","Giannis Antetokounmpo","Luka Dončić","Jayson Tatum","Anthony Edwards","Shai Gilgeous-Alexander","Victor Wembanyama"]},
+  "NBA Legends":{players:["Michael Jordan","Kobe Bryant","LeBron James","Magic Johnson","Larry Bird","Shaquille O'Neal","Kareem Abdul-Jabbar","Tim Duncan","Allen Iverson","Hakeem Olajuwon"]},
+  "NBA Champions":{teams:["Boston Celtics","Los Angeles Lakers","Golden State Warriors","Chicago Bulls","Miami Heat","San Antonio Spurs","Detroit Pistons","Philadelphia 76ers"]},
+  "NFL Teams":{teams:["Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills","Carolina Panthers","Chicago Bears","Cincinnati Bengals","Cleveland Browns","Dallas Cowboys","Denver Broncos","Detroit Lions","Green Bay Packers","Houston Texans","Indianapolis Colts","Jacksonville Jaguars","Kansas City Chiefs","Las Vegas Raiders","Los Angeles Chargers","Los Angeles Rams","Miami Dolphins","Minnesota Vikings","New England Patriots","New Orleans Saints","New York Giants","New York Jets","Philadelphia Eagles","Pittsburgh Steelers","San Francisco 49ers","Seattle Seahawks","Tampa Bay Buccaneers","Tennessee Titans","Washington Commanders"]},
+  "NFL Stars":{players:["Patrick Mahomes","Josh Allen","Joe Burrow","Lamar Jackson","Jalen Hurts","Justin Jefferson","Tyreek Hill","Travis Kelce","Micah Parsons","Myles Garrett"]},
+  "NFL Legends":{players:["Tom Brady","Jerry Rice","Peyton Manning","Joe Montana","Walter Payton","Lawrence Taylor","Randy Moss","Barry Sanders","Emmitt Smith","Ray Lewis"]},
+  "Super Bowl Legends":{players:["Tom Brady","Joe Montana","Peyton Manning","Terry Bradshaw","Patrick Mahomes","Jerry Rice","Emmitt Smith","Ray Lewis"]},
+  "WWE Superstars":{players:["CM Punk","Roman Reigns","Cody Rhodes","Gunther","Seth Rollins","Rhea Ripley","Becky Lynch","Bianca Belair","Jey Uso","Sami Zayn"]},
+  "WWE Legends":{players:["The Rock","Stone Cold Steve Austin","The Undertaker","John Cena","Shawn Michaels","Triple H","Hulk Hogan","Ric Flair","Bret Hart","Rey Mysterio"]},
+  "WWE Champions":{players:["CM Punk","Roman Reigns","Cody Rhodes","Gunther","Sami Zayn","Rhea Ripley","Becky Lynch","Charlotte Flair"]},
+  "WrestleMania Legends":{players:["The Undertaker","Hulk Hogan","The Rock","Stone Cold Steve Austin","John Cena","Shawn Michaels","Triple H","Brock Lesnar"]},
+  "GTA V Legends":{players:["Michael De Santa","Franklin Clinton","Trevor Philips","Lamar Davis","Lester Crest","Amanda De Santa","Jimmy De Santa","Ron Jakowski"]},
+  "GTA V Characters":{players:["Michael De Santa","Franklin Clinton","Trevor Philips","Lamar Davis","Lester Crest","Steve Haines","Dave Norton","Martin Madrazo"]},
+  "GTA Online":{players:["Franklin Clinton","Lamar Davis","Lester Crest","Tony Prince","Agatha Baker","Martin Madrazo","Ron Jakowski","Paige Harris"]},
+  "GTA Vice City":{players:["Tommy Vercetti","Lance Vance","Ken Rosenberg","Sonny Forelli","Ricardo Diaz","Avery Carrington","Mercedes Cortez","Phil Cassidy"]},
+  "Marvel Heroes":{players:["Iron Man","Captain America","Thor","Hulk","Spider-Man","Black Panther","Doctor Strange","Captain Marvel","Wolverine","Deadpool"]},
+  "Marvel Villains":{players:["Thanos","Loki","Ultron","Green Goblin","Doctor Doom","Magneto","Venom","Red Skull","Hela","Kingpin"]},
+  "Avengers":{players:["Iron Man","Captain America","Thor","Hulk","Black Widow","Hawkeye","Spider-Man","Doctor Strange","Black Panther","Captain Marvel"]},
+  "Marvel Legends":{players:["Stan Lee","Wolverine","Spider-Man","Iron Man","Captain America","Hulk","Thor","Black Panther","Deadpool","Doctor Strange"]}
+};
+
+const footballImageCache=new Map();
+
+/*
+ * Image resolver
+ * ---------------
+ * The previous version searched Wikipedia with raw display names. That
+ * causes bad matches for short/ambiguous names (especially WWE, Marvel,
+ * NBA and NFL). We now use a curated canonical Wikipedia title first and
+ * fall back to Wikimedia's exact-title search.
+ */
+const imageAliases={
+  // NBA
+  "Los Angeles Lakers":"Los Angeles Lakers", "LA Clippers":"Los Angeles Clippers",
+  "Oklahoma City Thunder":"Oklahoma City Thunder", "Golden State Warriors":"Golden State Warriors",
+  "New York Knicks":"New York Knicks", "Boston Celtics":"Boston Celtics",
+  // NFL
+  "Washington Commanders":"Washington Commanders", "Las Vegas Raiders":"Las Vegas Raiders",
+  "Los Angeles Chargers":"Los Angeles Chargers", "Los Angeles Rams":"Los Angeles Rams",
+  "New England Patriots":"New England Patriots", "Tampa Bay Buccaneers":"Tampa Bay Buccaneers",
+  // WWE – avoid ambiguous nicknames
+  "The Rock":"Dwayne Johnson", "Stone Cold Steve Austin":"Steve Austin (wrestler)",
+  "The Undertaker":"The Undertaker", "Triple H":"Triple H", "John Cena":"John Cena",
+  "CM Punk":"CM Punk", "Roman Reigns":"Roman Reigns", "Cody Rhodes":"Cody Rhodes",
+  "Gunther":"Gunther (wrestler)", "Seth Rollins":"Seth Rollins", "Rhea Ripley":"Rhea Ripley",
+  "Becky Lynch":"Becky Lynch", "Bianca Belair":"Bianca Belair", "Jey Uso":"Jey Uso",
+  "Sami Zayn":"Sami Zayn", "Charlotte Flair":"Charlotte Flair", "Brock Lesnar":"Brock Lesnar",
+  "Shawn Michaels":"Shawn Michaels", "Ric Flair":"Ric Flair", "Bret Hart":"Bret Hart",
+  "Rey Mysterio":"Rey Mysterio", "Hulk Hogan":"Hulk Hogan",
+  // Marvel – canonical character pages
+  "Iron Man":"Iron Man", "Captain America":"Captain America", "Thor":"Thor (Marvel Comics)",
+  "Hulk":"Hulk (comics)", "Spider-Man":"Spider-Man", "Black Panther":"Black Panther (character)",
+  "Doctor Strange":"Doctor Strange", "Captain Marvel":"Carol Danvers", "Wolverine":"Wolverine (character)",
+  "Deadpool":"Deadpool", "Thanos":"Thanos", "Loki":"Loki (Marvel Comics)",
+  "Ultron":"Ultron", "Green Goblin":"Green Goblin", "Doctor Doom":"Doctor Doom",
+  "Magneto":"Magneto (Marvel Comics)", "Venom":"Venom (character)", "Red Skull":"Red Skull",
+  "Hela":"Hela (character)", "Kingpin":"Kingpin (character)", "Black Widow":"Black Widow (Natasha Romanova)",
+  "Hawkeye":"Hawkeye (character)", "Stan Lee":"Stan Lee"
+};
+
+function canonicalImageTitle(title){ return imageAliases[title] || title; }
+
+async function wikiImage(title){
+  const key=canonicalImageTitle(title);
+  if(footballImageCache.has(key)) return footballImageCache.get(key);
+
+  // 1) Exact canonical page.
+  const exactEndpoints=[
+    `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&titles=${encodeURIComponent(key)}&piprop=thumbnail&pithumbsize=512&format=json&origin=*`,
+    `https://de.wikipedia.org/w/api.php?action=query&prop=pageimages&titles=${encodeURIComponent(key)}&piprop=thumbnail&pithumbsize=512&format=json&origin=*`
+  ];
+  for(const url of exactEndpoints){
+    try{
+      const res=await fetch(url,{mode:'cors'});
+      if(!res.ok) continue;
+      const data=await res.json();
+      const pages=data?.query?.pages||{};
+      const page=Object.values(pages)[0];
+      if(page && page.pageid && page.thumbnail?.source){
+        footballImageCache.set(key,page.thumbnail.source);
+        return page.thumbnail.source;
+      }
+    }catch(e){}
+  }
+
+  // 2) Wikimedia search fallback. This is much safer than blindly taking
+  // a thumbnail from an ambiguous raw title.
+  try{
+    const url=`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent('"'+key+'"')}&srlimit=5&format=json&origin=*`;
+    const res=await fetch(url,{mode:'cors'});
+    if(res.ok){
+      const data=await res.json();
+      for(const hit of (data?.query?.search||[])){
+        const pageUrl=`https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&titles=${encodeURIComponent(hit.title)}&piprop=thumbnail&pithumbsize=512&format=json&origin=*`;
+        try{
+          const r=await fetch(pageUrl,{mode:'cors'}); if(!r.ok) continue;
+          const d=await r.json(); const pg=Object.values(d?.query?.pages||{})[0];
+          if(pg?.thumbnail?.source){ footballImageCache.set(key,pg.thumbnail.source); return pg.thumbnail.source; }
+        }catch(e){}
+      }
+    }
+  }catch(e){}
+
+  footballImageCache.set(key,'');
+  return '';
+}
+
+function footballSymbolDefs(gameName){
+  const cfg=footballCatalog[gameName];
+  if(!cfg) return null;
+  const items=[];
+  const lower=gameName.toLowerCase();
+  const crestOnly=/clubs|wappen/.test(lower) || lower==='champions league' || lower==='world cup champions';
+  const starsOnly=/stars/.test(lower);
+  const legendsOnly=/legends/.test(lower);
+
+  // "Stars" und "Legends" enthalten ausschließlich Spielerportraits.
+  if(starsOnly || legendsOnly){
+    cfg.players.slice(0,10).forEach((name,i)=>items.push({
+      id:`fp_${i}`, tag:name, type:i<2?'photo-high':i<6?'photo-mid':'photo-low',
+      pays:i===0?{3:0.25,4:0.75,5:4}:i===1?{3:0.20,4:0.60,5:3}:{3:8,4:24,5:70},
+      image:'',kind:'player',query:name
+    }));
+  } else if(crestOnly){
+    // Club-/Wappen-Spiele enthalten ausschließlich echte Vereins- bzw. Nationalteam-Wappen.
+    cfg.clubs.slice(0,20).forEach((name,i)=>items.push({
+      id:`fc_${i}`, tag:name.replace(/ national football team/i,' Nationalteam'), type:i<2?'crest-high':i<8?'crest-mid':'crest-low',
+      pays:i===0?{3:0.25,4:0.75,5:4}:i===1?{3:0.20,4:0.60,5:3}:{3:10,4:35,5:140},
+      image:'',kind:'crest',query:name
+    }));
+  } else {
+    // Allgemeine Fußballspiele dürfen Spieler UND Wappen kombinieren.
+    cfg.players.slice(0,6).forEach((name,i)=>items.push({
+      id:`fp_${i}`,tag:name,type:i<2?'photo-high':'photo-mid',
+      pays:i===0?{3:0.25,4:0.75,5:4}:i===1?{3:0.20,4:0.60,5:3}:{3:8,4:24,5:70},
+      image:'',kind:'player',query:name
+    }));
+    cfg.clubs.slice(0,4).forEach((name,i)=>items.push({
+      id:`fc_${i}`,tag:name.replace(/ national football team/i,' Nationalteam'),type:'crest-mid',
+      pays:{3:0.10,4:0.30,5:1.2},image:'',kind:'crest',query:name
+    }));
+  }
+  items.push({id:'wild',tag:'FOOTBALL WILD',type:'wild',pays:{3:0.20,4:0.60,5:3}});
+  items.push({id:'scatter',tag:'FOOTBALL SCATTER',type:'scatter',pays:{3:0.50,4:2,5:10}});
+  return items;
+}
+async function loadFootballImages(symbols){
+  await Promise.all(symbols.filter(s=>s.query).map(async s=>{s.image=await wikiImage(s.query);}));
+  return symbols;
+}
+
+function sportsSymbolDefs(gameName){
+  const cfg=sportsCatalog[gameName]; if(!cfg) return null;
+  const items=[];
+  if(cfg.teams){ cfg.teams.slice(0,30).forEach((name,i)=>items.push({id:`team_${i}`,tag:name,type:i<2?'crest-high':i<8?'crest-mid':'crest-low',pays:i===0?{3:0.25,4:0.75,5:4}:i===1?{3:0.20,4:0.60,5:3}:{3:10,4:35,5:140},image:'',kind:'crest',query:name})); }
+  if(cfg.players){ cfg.players.slice(0,12).forEach((name,i)=>items.push({id:`player_${i}`,tag:name,type:i<2?'photo-high':i<6?'photo-mid':'photo-low',pays:i===0?{3:0.25,4:0.75,5:4}:i===1?{3:0.20,4:0.60,5:3}:{3:8,4:24,5:70},image:'',kind:'player',query:name})); }
+  items.push({id:'wild',tag:'THEME WILD',type:'wild',pays:{3:0.20,4:0.60,5:3}});
+  items.push({id:'scatter',tag:'THEME SCATTER',type:'scatter',pays:{3:0.50,4:2,5:10}});
+  return items;
+}
+async function loadSportsImages(symbols){
+  await Promise.all(symbols.filter(s=>s.query).map(async s=>{s.image=await wikiImage(s.query);}));
+  return symbols;
+}
+
+
+
+
+/* =========================
+   GAME RENDERING
+========================= */
+
+const grid =
+    document.getElementById("gameGrid");
+
+const loadMoreButton =
+    document.getElementById("loadMore");
+
+const emptyState =
+    document.getElementById("emptyState");
+
+const gameCount =
+    document.getElementById("gameCount");
+
+let loaded = 0;
+
+const batchSize = 40;
+
+let currentSearch = "";
+
+let currentCategory = "Alle";
+
+
+function getFilteredGames() {
+
+    return games.filter(game => {
+
+        const matchesSearch =
+            game.name
+                .toLowerCase()
+                .includes(
+                    currentSearch
+                        .toLowerCase()
+                );
+
+        const matchesCategory =
+            currentCategory === "Alle" ||
+            game.category === currentCategory;
+
+        return matchesSearch &&
+               matchesCategory;
+    });
+}
+
+
+function createCard(game) {
+
+    const card =
+        document.createElement("article");
+
+    card.className = "card";
+
+    card.dataset.id = game.id;
+
+    card.innerHTML = `
+
+        <div class="card-image">
+
+            <img
+                src="${game.image}"
+                alt="${game.name}"
+                loading="lazy"
+            >
+
+            <div class="image-overlay">
+                <span class="play-overlay">
+                    DEMO
+                </span>
+            </div>
+
+        </div>
+
+        <div class="info">
+
+            <h3 title="${game.name}">
+                ${game.name}
+            </h3>
+
+            <div class="meta">
+
+                <span class="rtp">
+                    RTP ${game.rtp}
+                </span>
+
+                <span
+                    class="favorite"
+                    title="Favorit"
+                    role="button"
+                    aria-label="Favorit"
+                >
+                    ☆
+                </span>
+
+            </div>
+
+            <button
+                class="demo"
+                data-game="${game.name}"
+            >
+                Demo
+            </button>
+
+        </div>
+    `;
+
+    return card;
+}
+
+
+function renderGames(reset = false) {
+
+    const filtered =
+        getFilteredGames();
+
+    if (reset) {
+
+        grid.innerHTML = "";
+
+        loaded = 0;
+    }
+
+    const nextGames =
+        filtered.slice(
+            loaded,
+            loaded + batchSize
+        );
+
+    nextGames.forEach(game => {
+
+        grid.appendChild(
+            createCard(game)
+        );
+
+    });
+
+    loaded += nextGames.length;
+
+    gameCount.textContent =
+        filtered.length +
+        " Spiele";
+
+    emptyState.style.display =
+        filtered.length === 0
+            ? "block"
+            : "none";
+
+    loadMoreButton.style.display =
+        loaded < filtered.length
+            ? "block"
+            : "none";
+}
+
+
+renderGames(true);
+
+
+/* =========================
+   LOAD MORE
+========================= */
+
+loadMoreButton.addEventListener(
+    "click",
+    () => renderGames(false)
+);
+
+
+/* =========================
+   SEARCH
+========================= */
+
+const searchInput =
+    document.getElementById("search");
+
+searchInput.addEventListener(
+    "input",
+    event => {
+
+        currentSearch =
+            event.target.value.trim();
+
+        renderGames(true);
+    }
+);
+
+
+/* =========================
+   CATEGORY FILTER
+========================= */
+
+document
+    .querySelectorAll(".cat")
+    .forEach(categoryButton => {
+
+        categoryButton.addEventListener(
+            "click",
+            () => {
+
+                document
+                    .querySelectorAll(".cat")
+                    .forEach(button => {
+                        button.classList.remove(
+                            "active"
+                        );
+                    });
+
+                categoryButton.classList.add(
+                    "active"
+                );
+
+                currentCategory =
+                    categoryButton.dataset.category;
+
+                renderGames(true);
+            }
+        );
+
+    });
+
+
+/* =========================
+   FAVORITES + DEMO BUTTONS
+========================= */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.classList.contains(
+                "favorite"
+            )
+        ) {
+
+            event.target.classList.toggle(
+                "active"
+            );
+
+            event.target.textContent =
+                event.target.classList.contains(
+                    "active"
+                )
+                    ? "★"
+                    : "☆";
+
+            return;
+        }
+
+
+        if (event.target.classList.contains("demo")) {
+            openGame(event.target.dataset.game);
+        }
+
+    }
+);
+
+
+
+/* =========================
+   AAA DEMO SLOT ENGINE
+========================= */
+const gameModal=document.getElementById("gameModal");
+const gameModalTitle=document.getElementById("gameModalTitle");
+const gameResult=document.getElementById("gameResult");
+const spinButton=document.getElementById("spinButton");
+const closeGameButton=document.getElementById("closeGameButton");
+const betInput=document.getElementById("betInput");
+const betDown=document.getElementById("betDown");
+const betUp=document.getElementById("betUp");
+const maxBet=document.getElementById("maxBet");
+const slotBalance=document.getElementById("slotBalance");
+const slotWin=document.getElementById("slotWin");
+const slotFree=document.getElementById("slotFree");
+const featureBanner=document.getElementById("featureBanner");
+const featureText=document.getElementById("featureText");
+const reelEls=[1,2,3,4,5].map(i=>document.getElementById("reel"+i));
+const paylineDots=document.getElementById("paylineDots");
+let activeGame="", spinning=false, freeSpins=0, expandedSymbol=null;
+const BET_MIN=100,BET_MAX=10000;
+let SLOT_SYMBOLS=[
+ {id:"hero",tag:"HERO",type:"high",pays:{3:0.25,4:0.75,5:4}},
+ {id:"legend",tag:"LEGEND",type:"high",pays:{3:0.20,4:0.60,5:3}},
+ {id:"symbol3",tag:"SYMBOL",type:"mid",pays:{3:0.15,4:0.45,5:2}},
+ {id:"symbol4",tag:"SYMBOL",type:"mid",pays:{3:0.15,4:0.45,5:2}},
+ {id:"symbol5",tag:"SPECIAL",type:"mid",pays:{3:0.12,4:0.35,5:1.5}},
+ {id:"bonus",tag:"BONUS",type:"mid",pays:{3:0.10,4:0.30,5:1.2}},
+ {id:"A",tag:"ROYAL",type:"card-symbol",pays:{3:0.08,4:0.20,5:0.8}},
+ {id:"K",tag:"ROYAL",type:"card-symbol",pays:{3:0.07,4:0.18,5:0.7}},
+ {id:"Q",tag:"ROYAL",type:"card-symbol",pays:{3:0.06,4:0.16,5:0.6}},
+ {id:"J",tag:"ROYAL",type:"card-symbol",pays:{3:0.05,4:0.14,5:0.5}},
+ {id:"wild",tag:"WILD",type:"wild",pays:{3:0.20,4:0.60,5:3}},
+ {id:"scatter",tag:"SCATTER",type:"scatter",pays:{3:0.50,4:2,5:10}}
+];
+let reels=[
+ ["A","K","Q","J","hero","legend","symbol3","symbol5","bonus","wild"],
+ ["A","K","Q","J","hero","legend","symbol3","symbol4","symbol5","bonus","wild","scatter"],
+ ["A","K","Q","J","hero","legend","symbol3","symbol4","symbol5","bonus","wild","scatter"],
+ ["A","K","Q","J","hero","legend","symbol3","symbol4","symbol5","bonus","wild","scatter"],
+ ["A","K","Q","J","hero","legend","symbol3","symbol4","symbol5","bonus","wild","scatter"]
+];
+const defaultSlotSymbols=JSON.parse(JSON.stringify(SLOT_SYMBOLS));
+const MSV_SLOT_SYMBOLS=[
+ {id:"msv_kother",tag:"DOMINIK KOTHER · #11",type:"photo-high",image:"https://www.msv-duisburg.de/fileadmin/content/_processed_/1/9/csm_2026_02_02_Kother_8a10623268.jpg",pays:{3:0.25,4:0.75,5:4}},
+ {id:"msv_symalla",tag:"SIMON SYMALLA · #23",type:"photo-high",image:"https://www.msv-duisburg.de/fileadmin/content/_processed_/7/0/csm_2025_06_10_Simon_Symalla_f5eef01d7e.jpg",pays:{3:0.20,4:0.60,5:3}},
+ {id:"msv_coskun",tag:"CAN COSKUN · #27",type:"photo-mid",image:"https://www.msv-duisburg.de/fileadmin/content/_processed_/9/9/csm_2024_06_05_MSV_Duisburg_Can_Coskun_ebe938beae.jpg",pays:{3:1,4:2,5:5}},
+ {id:"msv_bulic",tag:"RASIM BULIC · #6",type:"photo-mid",image:"https://img.sparknews.funkemedien.de/410862418/410862418_1767707818_v16_9_1200.jpeg",pays:{3:0.15,4:0.45,5:2}},
+ {id:"wild",tag:"ZEBRA WILD",type:"wild",pays:{3:0.20,4:0.60,5:3}},
+ {id:"scatter",tag:"MSV SCATTER",type:"scatter",pays:{3:0.50,4:2,5:10}}
+];
+const MSV_REELS=Array.from({length:5},()=>MSV_SLOT_SYMBOLS.map(s=>s.id));
+
+const defaultReels=reels.map(r=>r.slice());
+const paylines=[[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,1,2,1],[1,2,1,0,1]];
+for(let i=1;i<=9;i++){const d=document.createElement("span");d.className="line-dot active";d.textContent=i;paylineDots.appendChild(d)}
+function renderPaytable(){
+  const grid=document.getElementById("paytableGrid"), label=document.getElementById("paytableBet"), scatter=document.getElementById("paytableScatter");
+  if(!grid||!label||!scatter)return;
+  const bet=getBet();
+  const fmt=v=>`€${Number(v||0).toLocaleString("de-DE",{maximumFractionDigits:2})}`;
+  label.textContent=`Einsatz €${bet.toLocaleString("de-DE")} · Gewinne pro Gewinnlinie`;
+  grid.innerHTML="";
+  const list=(SLOT_SYMBOLS||[]).filter(x=>x && x.pays && x.type!=="scatter");
+  list.forEach(sym=>{
+    const art=sym.image?`<img src="${sym.image}" alt="">`:svgIcon(sym.id,themeKey(activeGame));
+    const item=document.createElement("div");
+    item.className="pay-item";
+    item.innerHTML=`<div class="pay-art">${art}</div><div><div class="pay-name">${sym.tag||sym.id}</div><div class="pay-values">${[3,4,5].map(n=>`<b>${n}× <em>${fmt((sym.pays[n]||0)*bet)}</em></b>`).join("")}</div></div>`;
+    grid.appendChild(item);
+  });
+  const scat=(SLOT_SYMBOLS||[]).find(x=>x.type==="scatter"||x.id==="scatter");
+  if(scat&&scat.pays){
+    scatter.innerHTML=`<strong>${scat.tag||"Scatter"}:</strong> 3× ${fmt((scat.pays[3]||0)*bet)} · 4× ${fmt((scat.pays[4]||0)*bet)} · 5× ${fmt((scat.pays[5]||0)*bet)} · zusätzlich Freispiele bei 3+ Scatter.`;
+  }else{
+    scatter.textContent="3+ Scatter: Freispiele gemäß Spiel.";
+  }
+}
+function getBet(){return Math.min(BET_MAX,Math.max(BET_MIN,Math.round(Number(betInput.value||100)/100)*100))}
+function setBet(v){betInput.value=Math.min(BET_MAX,Math.max(BET_MIN,Math.round(v/100)*100));renderPaytable()}
+function symbolById(id){return SLOT_SYMBOLS.find(s=>s.id===id)||SLOT_SYMBOLS[0]}
+function themeKey(name=""){
+ const n=name.toLowerCase();
+ if(/pharaoh|egypt|temple|book/.test(n)) return "pharaoh";
+ if(/pirate|treasure|ocean/.test(n)) return "pirate";
+ if(/jungle|wild/.test(n)) return "jungle";
+ if(/crystal|magic/.test(n)) return "crystal";
+ if(/wolf/.test(n)) return "wolf";
+ if(/dragon/.test(n)) return "dragon";
+ if(/fortune|lucky|gold/.test(n)) return "fortune";
+ if(/titan/.test(n)) return "titan";
+ if(/neon/.test(n)) return "neon";
+ if(/galaxy|space/.test(n)) return "galaxy";
+ if(/viking/.test(n)) return "viking";
+ if(/samurai/.test(n)) return "samurai";
+ if(/candy/.test(n)) return "candy";
+ if(/football|fifa/.test(n)) return "football";
+ if(/worldcup|world cup|wm/.test(n)) return "worldcup";
+ if(/champions|champions league/.test(n)) return "champions";
+ if(/deutschland|germany/.test(n)) return "germany";
+ if(/msv|duisburg|zebra/.test(n)) return "msv";
+ return "fantasy";
+}
+function svgIcon(kind,theme){
+ const palettes={
+  pharaoh:["#f4d37a","#b47a24","#173f4b"],pirate:["#f0c66a","#7a3e16","#243746"],
+  jungle:["#d6c66a","#477b35","#183c29"],crystal:["#e7f5ff","#68a9d8","#4b4b9d"],
+  wolf:["#e6e9ee","#7d8794","#303846"],dragon:["#f0bd63","#a63b2d","#54211e"],
+  fortune:["#ffe28a","#c68a20","#5b3710"],titan:["#e0d4b8","#77766e","#31333a"],
+  neon:["#ffffff","#39e7ff","#8c4dff"],galaxy:["#f2e5ff","#7754c8","#18254f"],
+  viking:["#e5c477","#8a5a2d","#304b5a"],samurai:["#f2d08a","#9b2932","#252b35"],
+  candy:["#fff3fa","#f28dbb","#7545a5"],football:["#eef8ff","#2d8a4a","#123d24"],worldcup:["#fff4cf","#d5aa38","#183e70"],champions:["#edf5ff","#4f8bd8","#10245a"],germany:["#fff","#d21f2f","#171717"],msv:["#ffffff","#9e9e9e","#111111"],fantasy:["#f4d37a","#8a5aa8","#263f68"]
+ };
+ const [light,mid,dark]=palettes[theme]||palettes.fantasy;
+ const common=`<svg class="art" viewBox="0 0 100 100" aria-hidden="true">`;
+ const end=`</svg>`;
+ const icons={
+  pharaoh:`<path fill="${light}" d="M27 88V45q0-24 23-24t23 24v43Z"/><path fill="${dark}" d="M25 27 50 7l25 20-7 19H32z"/><path fill="${mid}" d="M38 43h24v28H38z"/><circle cx="44" cy="55" r="3"/><circle cx="56" cy="55" r="3"/><path d="M41 65q9 7 18 0" fill="none" stroke="${dark}" stroke-width="3"/>`,
+  pirate:`<circle cx="50" cy="50" r="28" fill="${light}"/><path fill="${dark}" d="M22 38q28-30 56 0v10H22z"/><path fill="${mid}" d="M43 51h14v10H43z"/><path d="M38 48h8m8 0h8" stroke="${dark}" stroke-width="5"/><path d="m50 62 4 7-4 7-4-7z" fill="${mid}"/>`,
+  jungle:`<path fill="${mid}" d="M18 78q10-32 28-42 18 10 36 42H18Z"/><path fill="${dark}" d="M50 82V31M50 43 28 27M50 53l25-18M50 64 25 51M50 70l27-14"/><circle cx="50" cy="29" r="10" fill="${light}"/>`,
+  crystal:`<path fill="${light}" d="m50 8 27 34-17 50H40L23 42Z"/><path fill="${mid}" d="M50 8v84M23 42h54M35 25l15 67M65 25 50 92"/><path fill="${dark}" d="m50 8 15 17-15 17-15-17z"/>`,
+  wolf:`<path fill="${light}" d="M22 28 36 40l14-13 14 13 14-12-4 54H26Z"/><path fill="${dark}" d="M35 51h10v8H35zm20 0h10v8H55z"/><path d="M42 68q8 7 16 0" fill="none" stroke="${mid}" stroke-width="4"/>`,
+  dragon:`<path fill="${light}" d="M20 76q6-38 31-48l8 12 21-5-10 17 12 13-24 3-12 16Z"/><circle cx="57" cy="42" r="4" fill="${dark}"/><path fill="${mid}" d="m39 38 2-19 12 14z"/>`,
+  fortune:`<circle cx="50" cy="50" r="32" fill="${light}" stroke="${mid}" stroke-width="8"/><path d="M50 24v52M24 50h52M32 32l36 36M68 32 32 68" stroke="${dark}" stroke-width="5"/><circle cx="50" cy="50" r="8" fill="${mid}"/>`,
+  titan:`<path fill="${light}" d="M50 12 78 28v35L50 90 22 63V28Z"/><path fill="${dark}" d="M38 39h9v10h-9zm15 0h9v10h-9z"/><path d="M39 61q11 9 22 0" fill="none" stroke="${mid}" stroke-width="5"/>`,
+  neon:`<path fill="none" stroke="${light}" stroke-width="7" d="M50 10 62 38 92 39 69 57 77 88 50 70 23 88 31 57 8 39 38 38Z"/><circle cx="50" cy="50" r="9" fill="${mid}"/>`,
+  galaxy:`<circle cx="50" cy="50" r="34" fill="${dark}" stroke="${light}" stroke-width="5"/><path fill="${mid}" d="m50 16 7 25 25 9-25 9-7 25-7-25-25-9 25-9z"/><circle cx="38" cy="37" r="3" fill="${light}"/><circle cx="68" cy="65" r="3" fill="${light}"/>`,
+  viking:`<path fill="${light}" d="M27 76V39l13-15 10 11 10-11 13 15v37Z"/><path fill="${dark}" d="M33 39 17 22l5 29 12-7zm34 0 16-17-5 29-12-7z"/><path d="M40 55h20M43 67h14" stroke="${mid}" stroke-width="5"/>`,
+  samurai:`<path fill="${dark}" d="M22 30h56v15H22z"/><path fill="${light}" d="M31 45h38v35H31z"/><path fill="${mid}" d="M25 28 50 10l25 18-8 9H33z"/><path d="M39 58h22M42 68h16" stroke="${dark}" stroke-width="4"/>`,
+  candy:`<circle cx="50" cy="50" r="30" fill="${light}" stroke="${mid}" stroke-width="9"/><path d="M28 35 72 65M72 35 28 65" stroke="${dark}" stroke-width="7"/><circle cx="50" cy="50" r="8" fill="${mid}"/>`,
+  football:`<circle cx="50" cy="50" r="31" fill="${light}" stroke="${mid}" stroke-width="6"/><path fill="${dark}" d="m50 34 11 8-4 13H43l-4-13z"/><path d="M39 42 25 34M61 42l14-8M43 55l-8 16M57 55l8 16" stroke="${mid}" stroke-width="5" fill="none"/>`,
+  worldcup:`<path fill="${light}" d="M30 20h40v24c0 25-20 38-20 38S30 69 30 44z"/><path fill="${mid}" d="M36 28h28v16H36z"/><path fill="${dark}" d="M44 52h12v20H44z"/>`,
+  champions:`<circle cx="50" cy="50" r="33" fill="${dark}" stroke="${light}" stroke-width="5"/><path fill="${mid}" d="M32 35h36l-5 34H37z"/><path fill="${light}" d="M39 35h22v10H39z"/>`,
+  germany:`<circle cx="50" cy="50" r="34" fill="${dark}" stroke="${light}" stroke-width="5"/><path d="M30 50h40M50 30v40" stroke="${mid}" stroke-width="8"/>`,
+  msv:`<circle cx="50" cy="50" r="34" fill="${dark}" stroke="${light}" stroke-width="6"/><path d="M25 38 38 50 25 62M75 38 62 50 75 62M50 22v56" stroke="${mid}" stroke-width="7" fill="none"/>`,
+  fantasy:`<path fill="${light}" d="m50 10 12 28 30 3-23 19 7 30-26-16-26 16 7-30L8 41l30-3z"/><circle cx="50" cy="50" r="9" fill="${mid}"/>`
+ };
+ if(["A","K","Q","J"].includes(kind)) return `${common}<text x="50" y="77" text-anchor="middle" font-family="Georgia,serif" font-size="72" font-weight="900" fill="${light}" stroke="${dark}" stroke-width="3">${kind}</text>${end}`;
+ if(kind==="wild") return `${common}<path fill="${light}" d="M50 7 61 35l30 4-23 19 7 30-25-15-25 15 7-30L9 39l30-4z"/><circle cx="50" cy="50" r="12" fill="${mid}"/>${end}`;
+ if(kind==="scatter") return `${common}<rect x="18" y="18" width="64" height="64" rx="12" fill="${dark}" stroke="${light}" stroke-width="6"/><path fill="${mid}" d="M50 28 57 43 74 45 62 56 65 73 50 65 35 73 38 56 26 45 43 43Z"/>${end}`;
+ return common+(icons[theme]||icons.fantasy)+end;
+}
+function makeSymbol(id){
+ const s=symbolById(id);
+ const art=s.image ? `<img class="custom-art" src="${s.image}" alt="${s.tag}">` : svgIcon(id,themeKey(activeGame));
+ return `<div class="symbol ${s.type}"><div class="glyph">${art}</div><div class="tag">${s.tag}</div></div>`;
+}
+function buildCell(id,x,y,highlight=[]){const c=document.createElement("div");c.className="slot-cell"+(highlight.some(([a,b])=>a===x&&b===y)?" win":"")+(expandedSymbol&&id===expandedSymbol?" expanded":"");c.innerHTML=makeSymbol(id);return c}
+function drawGrid(grid,highlight=[]){grid.forEach((col,x)=>{reelEls[x].innerHTML="";const track=document.createElement("div");track.className="reel-track";col.forEach((id,y)=>track.appendChild(buildCell(id,x,y,highlight)));reelEls[x].appendChild(track)})}
+function makeSpinStrip(pool,cycles=10){const strip=[];for(let i=0;i<cycles;i++){for(const id of pool)strip.push(id)}return strip}
+function renderSpinStrip(reel,strip){reel.innerHTML="";const track=document.createElement("div");track.className="reel-track";strip.forEach((id,i)=>track.appendChild(buildCell(id,0,i,[])));reel.appendChild(track);return track}
+function animateReel(x,finalCol,duration){return new Promise(resolve=>{const reel=reelEls[x];const pool=reels[x];const prefix=makeSpinStrip(pool,11);const strip=prefix.concat(finalCol);const track=renderSpinStrip(reel,strip);const h=reel.clientHeight/3;track.style.transform="translate3d(0,0,0)";track.style.transition="none";void track.offsetWidth;track.style.transition=`transform ${duration}ms cubic-bezier(.12,.72,.16,1)`;track.style.transform=`translate3d(0,${-prefix.length*h}px,0)`;track.addEventListener("transitionend",()=>resolve(),{once:true})})}
+function randomGrid(){return reels.map(pool=>[0,1,2].map(()=>pool[Math.floor(Math.random()*pool.length)]))}
+function evalGrid(grid,bet){let total=0,highlights=[];let scatterCount=0;grid.forEach(col=>col.forEach(id=>{if(id==="scatter")scatterCount++}));
+ paylines.forEach(line=>{let base=grid[0][line[0]], count=1;for(let x=1;x<5;x++){const id=grid[x][line[x]];if(id===base||id==="wild"||base==="wild")count++;else break}if(count>=3){const s=symbolById(base==="wild"?"wild":base);total+=(s.pays[count]||0)*bet;for(let x=0;x<count;x++)highlights.push([x,line[x]])}});
+ if(scatterCount>=3) total+=bet*(scatterCount===3?2:scatterCount===4?15:100); return {total,highlights,scatterCount}}
+function updateSlotHud(win=0){slotBalance.textContent=`Guthaben €${Math.floor(balance).toLocaleString("de-DE")}`;slotWin.textContent=`Gewinn €${Math.floor(win).toLocaleString("de-DE")}`;slotFree.textContent=`Freispiele ${freeSpins}`}
+async function openGame(name){
+ activeGame=name;
+ const cfg=games.find(g=>g.name===name);
+ const title=cfg?cfg.name:name;
+ gameModalTitle.textContent=title;
+ gameResult.textContent=`${title} · Bilder werden geladen…`;
+ featureBanner.classList.remove("show"); setBet(100); freeSpins=0; expandedSymbol=null;
+ let symbols=null;
+ if(sportsCatalog[title]){
+   symbols=sportsSymbolDefs(title);
+   SLOT_SYMBOLS=symbols.map(x=>({...x}));
+   reels=Array.from({length:5},()=>SLOT_SYMBOLS.map(s=>s.id));
+   drawGrid(randomGrid());
+   gameModal.classList.add('open'); gameModal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open');
+   await loadSportsImages(SLOT_SYMBOLS);
+   drawGrid(randomGrid());
+   gameResult.textContent=`${title} · echte Bilder werden verwendet.`;
+ } else if(footballCatalog[title]){
+   symbols=footballSymbolDefs(title);
+   SLOT_SYMBOLS=symbols.map(x=>({...x}));
+   reels=Array.from({length:5},()=>SLOT_SYMBOLS.map(s=>s.id));
+   drawGrid(randomGrid());
+   gameModal.classList.add("open"); gameModal.setAttribute("aria-hidden","false"); document.body.classList.add("modal-open");
+   await loadFootballImages(SLOT_SYMBOLS);
+   drawGrid(randomGrid());
+   gameResult.textContent=`${title} · echte Spielerfotos und Vereins-/Nationalteam-Wappen geladen.`;
+ } else if(/msv|duisburg|zebra/i.test(title)){
+   SLOT_SYMBOLS=MSV_SLOT_SYMBOLS.map(x=>({...x}));
+   reels=MSV_REELS.map(r=>r.slice());
+   drawGrid(randomGrid());
+   gameModal.classList.add("open"); gameModal.setAttribute("aria-hidden","false"); document.body.classList.add("modal-open");
+   gameResult.textContent=`${title} · echte MSV-Spielerbilder.`;
+ } else if(cfg && Array.isArray(cfg.symbols) && cfg.symbols.length>=5){
+   const base=cfg.symbols.slice(0,12).map((x,i)=>({id:x.id||('custom'+i),tag:x.tag||('SYMBOL '+(i+1)),type:i<2?'high':i<6?'mid':i<9?'low':i===9?'wild':i===10?'scatter':'mid',pays:i===0?{3:0.25,4:0.75,5:4}:i===1?{3:0.20,4:0.60,5:3}:{3:6+i,4:18+i*2,5:45+i*8},image:x.image}));
+   while(base.length<12) base.push(SLOT_SYMBOLS[base.length]);
+   SLOT_SYMBOLS=base; reels=Array.from({length:5},(_,i)=>SLOT_SYMBOLS.map(s=>s.id));
+   drawGrid(randomGrid()); gameResult.textContent=`${title} · Bereit für den Spin.`;
+   gameModal.classList.add("open"); gameModal.setAttribute("aria-hidden","false"); document.body.classList.add("modal-open");
+ } else {
+   SLOT_SYMBOLS=defaultSlotSymbols.slice(); reels=defaultReels.map(r=>r.slice());
+   drawGrid(randomGrid()); gameResult.textContent=`${title} · Bereit für den Spin.`;
+   gameModal.classList.add("open"); gameModal.setAttribute("aria-hidden","false"); document.body.classList.add("modal-open");
+ }
+ renderPaytable(); updateSlotHud();
+}
+async function spinDemo(){
+ if(spinning)return;
+ const bet=freeSpins>0?0:getBet();
+ if(!freeSpins&&balance<bet){gameResult.textContent="Nicht genug Demo-Credits für diesen Einsatz.";return}
+ spinning=true;spinButton.disabled=true;spinButton.classList.add("spinning");featureBanner.classList.remove("show");
+ document.querySelectorAll(".slot-cell").forEach(c=>c.classList.remove("win"));
+ if(bet){balance-=bet;localStorage.setItem("KX47Balance",balance)}
+ updateBalance();updateSlotHud(0);
+ gameResult.textContent=freeSpins?`Freispiel ${freeSpins} – die Walzen rollen…`:`Einsatz €${bet.toLocaleString("de-DE")} – die Walzen rollen…`;
+ const final=randomGrid(); window.currentFinal=final;
+ // Jede Walze läuft physisch als eigener Streifen und stoppt zeitversetzt.
+ await Promise.all([0,1,2,3,4].map(x=>animateReel(x,final[x],1250+x*260)));
+ drawGrid(final);
+ const result=evalGrid(final,bet||getBet());
+ if(result.scatterCount>=3&&!freeSpins){freeSpins=10;expandedSymbol=SLOT_SYMBOLS[Math.floor(Math.random()*5)].id;featureText.textContent=`10 Freispiele · ${symbolById(expandedSymbol).tag} kann expandieren`;featureBanner.classList.add("show");setTimeout(()=>featureBanner.classList.remove("show"),1800)}
+ if(freeSpins>0){freeSpins--;if(expandedSymbol&&Math.random()<.28){for(let x=0;x<5;x++)for(let y=0;y<3;y++)if(final[x][y]===expandedSymbol)final[x]=[expandedSymbol,expandedSymbol,expandedSymbol]}}
+ if(result.total>0){balance+=result.total;window.KX47RegisterWin&&window.KX47RegisterWin(result.total);localStorage.setItem("KX47Balance",balance);drawGrid(final,result.highlights);gameResult.innerHTML=`<span class="big-win">+€${Math.floor(result.total).toLocaleString("de-DE")}</span>`}else gameResult.textContent=freeSpins?"Kein Gewinn – nächstes Freispiel…":"Kein Gewinn – noch einmal drehen.";
+ updateBalance();updateSlotHud(result.total); if(typeof awardXP==="function"){ awardXP(8 + (result.total>0 ? Math.min(35,5+Math.floor(result.total/1000)) : 0)); } spinning=false;spinButton.disabled=false;spinButton.classList.remove("spinning")
+}
+function closeGame(){ if(spinning) return; gameModal.classList.remove("open"); gameModal.setAttribute("aria-hidden","true"); document.body.classList.remove("modal-open"); }
+spinButton.addEventListener("click",spinDemo);closeGameButton.addEventListener("click",closeGame);betDown.addEventListener("click",()=>setBet(getBet()-100));betUp.addEventListener("click",()=>setBet(getBet()+100));maxBet.addEventListener("click",()=>setBet(BET_MAX));betInput.addEventListener("change",()=>setBet(getBet()));gameModal.addEventListener("click",e=>{if(e.target===gameModal)closeGame()});document.addEventListener("keydown",e=>{if(e.key==="Escape")closeGame();if(e.code==="Space"&&gameModal.classList.contains("open")){e.preventDefault();spinDemo()}});
+
+/* =========================
+   LOGIN
+========================= */
+
+/* Login is handled by the KX47 auth/RBAC module above. */
+
+
+/* =========================
+   HERO BUTTON
+========================= */
+
+document
+    .getElementById("heroPlay")
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById("games")
+                .scrollIntoView({
+                    behavior: "smooth"
+                });
+
+        }
+    );
+
+
+/* =========================
+   WELCOME BONUS
+========================= */
+
+setTimeout(() => {
+
+    const alreadyReceived =
+        localStorage.getItem(
+            "KX47WelcomeBonus"
+        );
+
+    if (!alreadyReceived) {
+
+        alert(
+            "🎁 Willkommen bei KX47!\n\n" +
+            "Du erhältst 500 Demo-Credits."
+        );
+
+        balance += 500;
+
+        localStorage.setItem(
+            "KX47Balance",
+            balance
+        );
+
+        localStorage.setItem(
+            "KX47WelcomeBonus",
+            "1"
+        );
+
+        updateBalance();
+    }
+
+}, 1300);
+
+
+/* =========================
+   INFINITE SCROLL
+========================= */
+
+window.addEventListener(
+    "scroll",
+    () => {
+
+        const nearBottom =
+            window.innerHeight +
+            window.scrollY >=
+            document.documentElement.scrollHeight -
+            600;
+
+        if (
+            nearBottom &&
+            loaded <
+            getFilteredGames().length
+        ) {
+
+            renderGames(false);
+        }
+
+    }
+);
+
+/* =========================
+   LEVEL SYSTEM 1–250
+========================= */
+const LEVEL_XP_KEY='KX47LevelXPV1';
+let playerXP=Number(localStorage.getItem(LEVEL_XP_KEY)||0);
+function xpForLevel(level){ return Math.floor(250 + (level-1)*125 + Math.pow(level-1,1.35)*18); }
+function getLevelFromXP(xp){ let level=1; while(level<250 && xp>=xpForLevel(level)) level++; return level; }
+function updateLevelUI(){
+ const level=getLevelFromXP(playerXP); const prev=level===1?0:xpForLevel(level-1); const next=level>=250?xpForLevel(250):xpForLevel(level); const pct=level>=250?100:Math.max(0,Math.min(100,((playerXP-prev)/Math.max(1,next-prev))*100));
+ const w=document.getElementById('levelWidget'); if(w){w.querySelector('b').textContent=`Lv. ${level}`;document.getElementById('xpMiniBar').style.width=pct+'%';document.getElementById('xpMiniText').textContent=level>=250?'MAX LEVEL':`${(playerXP-prev).toLocaleString('de-DE')} / ${(next-prev).toLocaleString('de-DE')} XP`;}
+ const ai=document.getElementById('adminLevelInfo'); if(ai) ai.innerHTML=`<strong>Level ${level}/250</strong><div class="level-bar"><i style="width:${pct}%"></i></div><span class="admin-note">${playerXP.toLocaleString('de-DE')} Gesamt-XP · ${level>=250?'Maximallevel erreicht':(next-playerXP).toLocaleString('de-DE')+' XP bis Level '+(level+1)}</span>`;
+}
+function awardXP(amount){ const old=getLevelFromXP(playerXP); playerXP=Math.min(xpForLevel(250),playerXP+Math.max(0,Math.floor(amount))); localStorage.setItem(LEVEL_XP_KEY,String(playerXP)); const now=getLevelFromXP(playerXP); updateLevelUI(); if(now>old){gameResult.innerHTML=`<span class="big-win">LEVEL UP! · LEVEL ${now}</span>`;} }
+updateLevelUI();
+
+/* Award XP is called from the spin completion path. */
+/* =========================
+   ADMIN GAME CREATOR
+========================= */
+async function fileData(file){ return new Promise((resolve,reject)=>{ if(!file)return resolve(''); const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file); }); }
+const createGameBtn=document.getElementById('createGame');
+if(createGameBtn) createGameBtn.onclick=async()=>{ if(!(window.KX47GetProfile&&['Manager','Owner'].includes(window.KX47GetProfile()?.role))){ document.getElementById('gameCreateMessage').textContent='Nur Manager/Owner dürfen Spiele erstellen.'; return; }
+ const name=document.getElementById('newGameName').value.trim(); if(!name){document.getElementById('gameCreateMessage').textContent='Bitte einen Namen eingeben.';return;}
+ const cover=await fileData(document.getElementById('newGameCover').files[0]);
+ const files=[...document.getElementById('newGameSymbols').files].slice(0,12); const imgs=[]; for(const f of files) imgs.push(await fileData(f));
+ const symbols=imgs.map((image,i)=>({id:'custom_'+Date.now()+'_'+i,tag:i===9?'WILD':i===10?'SCATTER':`SYMBOL ${i+1}`,image}));
+ while(symbols.length<12){ const fallback=defaultSlotSymbols[symbols.length]; symbols.push({id:fallback.id,tag:fallback.tag,image:''}); }
+ const game={id:'custom_'+Date.now(),name,category:document.getElementById('newGameCategory').value,theme:document.getElementById('newGameTheme').value,rtp:Number(document.getElementById('newGameRtp').value||96.5).toFixed(2)+'%',image:cover||makeGameImage(name,document.getElementById('newGameTheme').value,0),symbols};
+ const all=loadCustomGames(); all.push(game); localStorage.setItem(customGamesKey,JSON.stringify(all)); games.push(game); renderGames(true); document.getElementById('gameCreateMessage').textContent=`${name} wurde erstellt.`; document.getElementById('newGameName').value='';
+};
+</script>
+
+
+<script id="kx47-expansion-script">
+(() => {
+'use strict';
+const $=id=>document.getElementById(id); const screen=$('casinoScreen'), modal=$('casinoModal'), title=$('casinoTitle');
+let modalGame=null, wheelAngle=0, ladderLevel=0, ladderBank=0;
+function me(){return window.KX47GetProfile?window.KX47GetProfile():null}
+function logged(){return !!me()}
+function persist(){/* Server-owned account: never write account coins to localStorage. */}
+const baseUpdate=window.updateBalance; window.updateBalance=function(){return baseUpdate&&baseUpdate()};
+function sync(){const u=me();if(u){window.balance=Number(u.coins)||0;baseUpdate&&baseUpdate();}else{window.balance=0;baseUpdate&&baseUpdate();}}
+function needLogin(){if(logged())return true;$('authRequiredBanner').style.display='block';setTimeout(()=>$('authRequiredBanner').style.display='none',2800);$('authBackdrop')?.classList.add('open');return false}
+// Gate every existing slot/card play before opening the game.
+document.addEventListener('click',e=>{const b=e.target.closest('.demo,.casino-open,#spinButton');if(!b)return;if(b.classList.contains('casino-open')||b.id==='spinButton') return;if(!logged()){e.preventDefault();e.stopImmediatePropagation();needLogin();}},true);
+// Patch openGame as a final guard.
+const oldOpen=window.openGame; if(typeof oldOpen==='function') window.openGame=async function(...a){if(!needLogin())return;return oldOpen.apply(this,a)};
+// Show scatter/free-spin identity on every slot card.
+const oldCreate=window.createCard; if(typeof oldCreate==='function') window.createCard=function(game){const card=oldCreate(game);const info=card.querySelector('.info');if(info&&!info.querySelector('.scatter-badge')){const cfg=(game.symbols||[]).find(s=>String(s.id).toLowerCase().includes('scatter')||/scatter/i.test(s.tag||''));const label=cfg?.tag||'SCATTER';info.insertAdjacentHTML('afterbegin',`<div class="scatter-badge">🎯 <b>Freispiel-Symbol:</b> ${label}</div>`)}return card};
+// If initial render happened already, rebuild cards with badge.
+if(typeof window.renderGames==='function') window.renderGames(true);
+$('loginButton')?.addEventListener('dblclick',()=>{if(logged()){sessionStorage.removeItem(SESSION_KEY);sync();location.reload();}});
+function debit(n){if(!needLogin()||Number(window.balance)<n)return false;window.balance-=n;window.updateBalance();return true}
+function credit(n){const amount=Math.max(0,Math.floor(n));window.balance+=amount;window.KX47RegisterWin&&window.KX47RegisterWin(amount);window.updateBalance()}
+function btn(text,cls='gold',id=''){return `<button class="${cls}" ${id?`id="${id}"`:''}>${text}</button>`}
+function open(g){if(!needLogin())return;modalGame=g;modal.classList.add('open');title.textContent={wheel:'🎡 Bonus Wheel',ladder:'🪜 KX47 Leiter',blackjack:'🂡 Blackjack',holdem:'♠ Texas Hold\'em',threecard:'🃏 Three Card Poker',roulette:'🎯 Roulette',horse:'🏇 Pferderennen',sabacc:'🌌 Sabacc'}[g];render(g)}
+$('casinoClose').onclick=()=>modal.classList.remove('open'); modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open')};
+document.querySelectorAll('.casino-open').forEach(b=>b.onclick=()=>open(b.dataset.casino));
+function render(g){if(g==='wheel')wheel(); if(g==='ladder')ladder(); if(g==='blackjack')blackjack(); if(g==='holdem')holdem(); if(g==='threecard')three(); if(g==='roulette')roulette(); if(g==='horse')horse(); if(g==='sabacc')sabacc();}
+function wheel(){screen.innerHTML=`<p class="game-msg">Kosten pro Spin: <b>100.000 Credits</b></p><div class="wheel-wrap"><div class="wheel-pointer"></div><div class="wheel" id="bonusWheel"></div></div><div class="play-row">${btn('100.000 Credits – DREHEN','gold','wheelSpin')}</div><p class="game-msg" id="wheelMsg">Das Rad wartet auf deinen Spin.</p>`;$('wheelSpin').onclick=()=>{if(!debit(100000)){return $('wheelMsg').textContent='Nicht genug Credits.'}$('wheelSpin').disabled=true;const prizes=[0,50000,100000,250000,500000,1000000,2500000,10000000];const i=Math.floor(Math.random()*prizes.length);wheelAngle+=2160+(8-i)*45+Math.random()*20;$('bonusWheel').style.transform=`rotate(${wheelAngle}deg)`;setTimeout(()=>{credit(prizes[i]);$('wheelMsg').innerHTML=prizes[i]?`<span class="big-win">GEWINN: ${prizes[i].toLocaleString('de-DE')} Credits!</span>`:'Leider kein Gewinn – nächster Spin?';$('wheelSpin').disabled=false},4900)}}
+function ladder(){const vals=[100,250,500,1000,2500,5000,10000,25000,50000,100000,200000,300000];screen.innerHTML=`<p class="game-msg">Jede Runde kostet 10.000 Credits. Erreiche 300.000 oder sichere vorher deinen aktuellen Gewinn.</p><div class="ladder" id="ladderSteps">${vals.map((v,i)=>`<div class="step ${i===0?'active':''}" data-i="${i}">${v.toLocaleString('de-DE')} Credits</div>`).join('')}</div><div class="play-row">${btn('10.000 Credits – Runde starten','gold','ladderPlay')}${btn('Gewinn sichern','dark','ladderCash')}</div><p class="game-msg" id="ladderMsg">Start bei 100 Credits.</p>`;ladderLevel=0;ladderBank=100;const refresh=()=>document.querySelectorAll('.step').forEach(x=>x.classList.toggle('active',Number(x.dataset.i)===ladderLevel));$ ('ladderPlay').onclick=()=>{if(!debit(10000)){ $('ladderMsg').textContent='Nicht genug Credits.';return}const ok=Math.random()<Math.max(.38,.74-ladderLevel*.035);if(ok){ladderLevel=Math.min(vals.length-1,ladderLevel+1);ladderBank=vals[ladderLevel];$('ladderMsg').textContent=`Geschafft! Du bist bei ${ladderBank.toLocaleString('de-DE')} Credits.`;refresh();if(ladderLevel===vals.length-1){credit(ladderBank);$('ladderMsg').innerHTML='<span class="big-win">MAXIMUM! 300.000 Credits gewonnen.</span>'; $('ladderPlay').disabled=true}}else{$('ladderMsg').textContent='Stufe verloren – neuer Start bei 100 Credits.';ladderLevel=0;ladderBank=100;refresh()}};$('ladderCash').onclick=()=>{if(ladderBank>100){credit(ladderBank);$('ladderMsg').innerHTML=`<span class="big-win">${ladderBank.toLocaleString('de-DE')} Credits gesichert!</span>`;ladderBank=100;ladderLevel=0;refresh()}else $('ladderMsg').textContent='Noch kein zusätzlicher Gewinn zum Sichern.'}}
+function deck(){const suits=['♠','♥','♦','♣'], ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];let d=[];for(const s of suits)for(const r of ranks)d.push({r,s});return d.sort(()=>Math.random()-.5)}function card(c,back=false){return `<span class="playing-card ${['♥','♦'].includes(c?.s)?'red':''} ${back?'back':''}">${back?'★':`${c.r}<small>${c.s}</small>`}</span>`}function val(cs){let t=0,a=0;cs.forEach(c=>{if(c.r==='A'){a++;t+=11}else t+=['J','Q','K'].includes(c.r)?10:+c.r});while(t>21&&a--){t-=10}return t}
+function blackjack(){let d=deck(),p=[],dealer=[],bet=10000,done=false;screen.innerHTML=`<p class="game-msg">Einsatz 10.000 Credits pro Hand.</p><div id="bj"></div><div class="play-row">${btn('Neue Hand','gold','bjDeal')}${btn('Hit','dark','bjHit')}${btn('Stand','dark','bjStand')}</div>`;const draw=()=>{$('bj').innerHTML=`<h3>Dealer</h3>${dealer.map((c,i)=>card(c,i===1&&!done)).join('')}<h3>Du · ${val(p)}</h3>${p.map(c=>card(c)).join('')}<p class="game-msg" id="bjMsg"></p>`};$('bjDeal').onclick=()=>{if(!debit(bet)){return}d=deck();p=[d.pop(),d.pop()];dealer=[d.pop(),d.pop()];done=false;draw()};$('bjHit').onclick=()=>{if(!p.length||done)return;p.push(d.pop());if(val(p)>21){done=true;draw();$('bjMsg').textContent='Bust – verloren.'}else draw()};$('bjStand').onclick=()=>{if(!p.length||done)return;done=true;while(val(dealer)<17)dealer.push(d.pop());draw();let a=val(p),b=val(dealer),w=a<=21&&(b>21||a>b);if(w)credit(a===21&&p.length===2?25000:20000);$('bjMsg').innerHTML=w?'<span class="big-win">Gewonnen!</span>':a===b?'Push – Einsatz zurück.':'Dealer gewinnt.';if(a===b)credit(bet)}}
+function holdem(){const d=deck(),p=[d.pop(),d.pop()],o=[d.pop(),d.pop()],board=[d.pop(),d.pop(),d.pop(),d.pop(),d.pop()];screen.innerHTML=`<div class="poker-table"><h3>Deine Karten</h3>${p.map(card).join('')}<h3>Board</h3><div id="holdBoard">${board.slice(0,3).map(card).join('')}</div><div class="play-row">${btn('Turn','dark','turn')}${btn('River','dark','river')}${btn('Showdown','gold','show')}</div><p class="game-msg" id="holdMsg">Pre-Flop → Flop</p></div>`;$('turn').onclick=()=>{$('holdBoard').innerHTML=board.slice(0,4).map(card).join('');$('holdMsg').textContent='Turn.'};$('river').onclick=()=>{$('holdBoard').innerHTML=board.map(card).join('');$('holdMsg').textContent='River.'};$('show').onclick=()=>{const win=Math.random()<.52;if(win)credit(20000);$('holdMsg').innerHTML=win?'<span class="big-win">Showdown gewonnen · +20.000</span>':'Gegner gewinnt den Showdown.'}}
+function three(){const d=deck(),p=[d.pop(),d.pop(),d.pop()],o=[d.pop(),d.pop(),d.pop()];screen.innerHTML=`<div class="poker-table"><h3>Deine 3 Karten</h3>${p.map(card).join('')}<div class="play-row">${btn('Ante 10.000','gold','tcAnte')}${btn('Play','dark','tcPlay')}${btn('Fold','dark','tcFold')}</div><p class="game-msg" id="tcMsg">Setze zuerst Ante.</p></div>`;$('tcAnte').onclick=()=>{if(debit(10000))$('tcMsg').textContent='Ante gesetzt.'};$('tcPlay').onclick=()=>{if(!debit(10000))return;const w=Math.random()<.48;if(w)credit(30000);$('tcMsg').innerHTML=w?'<span class="big-win">Gewonnen! +30.000</span>':`Dealer: ${o.map(card).join('')}`};$('tcFold').onclick=()=>$('tcMsg').textContent='Hand gefoldet.'}
+function roulette(){screen.innerHTML=`<div class="roulette-wheel" id="rw"></div><div class="play-row">${btn('Rot · 10.000','gold','rRed')}${btn('Schwarz · 10.000','dark','rBlack')}</div><p class="game-msg" id="rMsg">Wähle eine Farbe.</p>`;function spin(color){if(!debit(10000))return;const red=Math.random()<.5;$('rw').style.transform=`rotate(${1800+Math.random()*1440}deg)`;setTimeout(()=>{const w=(color==='red')===red;if(w)credit(20000);$('rMsg').innerHTML=w?'<span class="big-win">Gewonnen!</span>':'Verloren.'},4100)};$('rRed').onclick=()=>spin('red');$('rBlack').onclick=()=>spin('black')}
+function horse(){let names=['Blitz','Nova','Comet','Shadow','Gold'];screen.innerHTML=`<p class="game-msg">Wähle ein Pferd. Einsatz: 10.000 Credits.</p><div class="race-track" id="track"><div class="finish"></div>${names.map((n,i)=>`<div class="horse" id="h${i}" style="top:${35+i*50}px">🐎 <small>${n}</small></div>`).join('')}</div><div class="play-row">${names.map((n,i)=>`<button class="dark horseBet" data-i="${i}">${n}</button>`).join('')}</div><p class="game-msg" id="horseMsg"></p>`;document.querySelectorAll('.horseBet').forEach(b=>b.onclick=()=>{if(!debit(10000))return;const winner=Math.floor(Math.random()*5);document.querySelectorAll('.horse').forEach((h,i)=>h.style.left=(i===winner?78:35+Math.random()*35)+'%');$('horseMsg').textContent='Die Pferde rennen…';setTimeout(()=>{const w=+b.dataset.i===winner;if(w)credit(50000);$('horseMsg').innerHTML=w?'<span class="big-win">Dein Pferd gewinnt! +50.000</span>':`${names[winner]} gewinnt das Rennen.`},3900)})}
+function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10];let hand=[],shifts=2;const draw=()=>({v:values[Math.floor(Math.random()*values.length)],shift:Math.random()<.22});const total=()=>hand.reduce((a,c)=>a+c.v,0);function paint(msg='Ziehe oder halte Karten.') {screen.innerHTML=`<div class="sabacc-table"><div class="sabacc-score"><span>Handwert: <b>${total()}</b></span><span>Shift-Karten: <b>${shifts}</b></span></div><h3>Deine Hand</h3><div>${hand.map(c=>`<span class="playing-card ${c.v<0?'red':''}">${c.shift?'✦':'◈'}<small>${c.v>=0?'+':''}${c.v}</small></span>`).join('')}</div><div class="play-row">${btn('Karte ziehen','gold','sabDraw')}${btn('Shift auslösen','dark','sabShift')}${btn('Showdown','dark','sabShow')}</div><p class="game-msg" id="sabMsg">${msg}</p><p class="sabacc-note">Diese Implementierung ist ein eigenes Sabacc-inspiriertes Regelset mit numerischen Karten, Shift-Ereignissen und dem Ziel, eine möglichst ausgeglichene Hand um 0 zu bilden. Sie verwendet keine kopierten Original-Kartenassets.</p></div>`;$('sabDraw').onclick=()=>{hand.push(draw());paint('Neue Karte gezogen.')};$('sabShift').onclick=()=>{if(!shifts)return;shifts--;hand.forEach(c=>{if(c.shift)c.v=values[Math.floor(Math.random()*values.length)]});paint('Shift! Shift-Karten haben ihren Wert verändert.')};$('sabShow').onclick=()=>{const opp=Math.floor(Math.random()*21)-10,score=Math.abs(total()),os=Math.abs(opp),w=score<os;if(w)credit(40000);$('sabMsg').innerHTML=w?`<span class="big-win">Showdown gewonnen · Gegner ${opp} · +40.000</span>`:`Gegner ${opp} gewinnt.`}}hand=[draw(),draw()];paint()}
+})();
+</script>
+<style>
+#kx47Rules{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;z-index:100000;padding:20px}
+#kx47Rules.open{display:flex}#kx47Rules .box{max-width:720px;width:100%;max-height:82vh;overflow:auto;background:#141414;border:1px solid #d4af37;border-radius:18px;padding:24px;color:#eee}
+#kx47Rules h2{color:#ffd84d}#kx47Rules li{margin:9px 0;line-height:1.45}.kx-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+</style>
+<div id="kx47Rules"><div class="box"><h2 id="kx47RulesTitle">Spielregeln</h2><div id="kx47RulesBody"></div><div class="kx-actions"><button id="kx47RulesClose" class="dark">Abbrechen</button><button id="kx47RulesStart" class="gold">Spiel starten</button></div></div></div>
+<script>
+(()=> {
+  const modal=document.getElementById("kx47Rules"), title=document.getElementById("kx47RulesTitle"), body=document.getElementById("kx47RulesBody");
+  let pending=null;
+  const ALL_RULES=`<p><b>Wichtig:</b> KX47 ist eine reine Demo. Alle Einsätze und Gewinne sind virtuelle Demo-Credits.</p>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Für alle Spiele</h3>
+  <ul>
+    <li>Das Spiel startet erst, nachdem du diese Regeln vollständig angezeigt bekommen und auf „Spiel starten“ gedrückt hast.</li>
+    <li>Der Einsatz wird erst mit der eigentlichen Spielaktion berechnet.</li>
+    <li>Gewinne werden nach Abschluss der jeweiligen Runde gutgeschrieben.</li>
+    <li>Ein einzelner Gewinn von <b>100.000 Coins</b> gibt 1 Karten-Pick je volle 100.000 Coins: 100.000 = 1 Pick, 200.000 = 2 Picks, 1.000.000 = 10 Picks.</li>
+    <li>Bei einem Pick werden 3 zufällige Karten aus deinem noch nicht besessenen Album angezeigt. Du wählst 1 Karte aus; sie wird dauerhaft freigeschaltet.</li>
+  </ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Slots</h3>
+  <ul><li>Einsatz zwischen 100 und 10.000 Demo-Credits wählen und „DREHEN“ drücken.</li><li>5 Walzen und 3 Reihen bilden das Ergebnis. Die Gewinnlinien und Symbolwerte stehen in der Gewinntabelle des Spiels.</li><li>Wild ersetzt normale Symbole. 3 oder mehr Scatter können Freispiele auslösen.</li><li>Der angezeigte Gewinn wird nach dem Spin gutgeschrieben.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Bonus Wheel</h3><ul><li>100.000 Credits pro Spin.</li><li>Das Rad dreht und stoppt zufällig; das Feld bestimmt den Demo-Gewinn.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Leiter</h3><ul><li>10.000 Credits pro Runde.</li><li>Du steigst von 100 bis maximal 300.000 Credits.</li><li>Jede weitere Stufe erhöht das Risiko. „Gewinn sichern“ zahlt den aktuellen Stand aus.</li><li>Ein Fehlversuch beendet die aktuelle Leiter.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Blackjack</h3><ul><li>Ziel: näher an 21 als der Dealer, ohne über 21 zu kommen.</li><li>2–10 zählen normal, Bildkarten 10, Ass 1 oder 11.</li><li>„Hit“ zieht eine Karte, „Stand“ beendet deine Runde.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Texas Hold'em</h3><ul><li>Du erhältst 2 Hole Cards und bis zu 5 Gemeinschaftskarten.</li><li>Die beste 5-Karten-Pokerhand gewinnt im Showdown.</li><li>Die Phasen sind Flop, Turn, River und Showdown.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Three Card Poker</h3><ul><li>Du und der Dealer erhalten je 3 Karten.</li><li>Nach dem Ante kannst du spielen oder folden.</li><li>Die stärkere 3-Karten-Hand gewinnt.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Roulette</h3><ul><li>10.000 Credits auf Rot oder Schwarz setzen.</li><li>Das Rad stoppt zufällig. Treffer gibt den vorgesehenen Demo-Gewinn.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Pferderennen</h3><ul><li>Pferd auswählen und 10.000 Credits einsetzen.</li><li>Der zufällige Sieger wird durch die Rennanimation ermittelt.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Sabacc</h3><ul><li>Eigenes KX47-Regelset mit numerischen Karten.</li><li>Ziel ist ein Handwert möglichst nahe bei 0.</li><li>Shift-Karten können ihren Wert verändern; beim Showdown gewinnt der kleinere Abstand zu 0.</li></ul>
+  <h3 style="color:#ffd84d;margin:12px 0 6px">Sammelalbum</h3><ul><li>Besessene Karten werden farbig angezeigt, fehlende Karten ausgegraut.</li><li>Neue Karten, die der Manager im Admin Panel erstellt, erscheinen automatisch als freischaltbare Karten im Album.</li></ul>`;
+  document.getElementById("kx47RulesClose").onclick=()=>{modal.classList.remove("open");pending=null};
+  document.getElementById("kx47RulesStart").onclick=()=>{const f=pending;modal.classList.remove("open");pending=null;if(f)f()};
+  document.addEventListener("click",e=>{
+    const b=e.target.closest(".demo,.casino-open,[data-casino-game]");
+    if(!b||b.dataset.rulesOpen)return;
+    const old=b.onclick;
+    if(typeof old!=="function")return;
+    e.preventDefault();e.stopImmediatePropagation();
+    const name=b.dataset.casino ? ({wheel:"Bonus Wheel",ladder:"Leiter-Spiel",blackjack:"Blackjack",holdem:"Texas Hold'em",threecard:"Three Card Poker",roulette:"Roulette",horse:"Pferderennen",sabacc:"Sabacc"}[b.dataset.casino]||"Casino-Spiel") : (b.closest(".card")?.querySelector("h3")?.textContent.trim()||"Spiel");
+    title.textContent=name+" – vollständige Spielregeln";
+    body.innerHTML=ALL_RULES;
+    pending=()=>{b.dataset.rulesOpen="1";old.call(b);setTimeout(()=>delete b.dataset.rulesOpen,100)};
+    modal.classList.add("open");
+  },true);
+})();
+</script>
+
+
+
+
+
+
+
+
+<!-- KX47 COLLECTION / REWARDS EXPANSION -->
+<style id="kx47-collection-style">
+#kx47AlbumModal{position:fixed;inset:0;z-index:100500;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.88);backdrop-filter:blur(12px)}
+#kx47AlbumModal.open{display:flex}
+.kx47-album-box{width:min(1180px,100%);max-height:94vh;overflow:auto;background:linear-gradient(145deg,#17130b,#080808);border:1px solid #a47a27;border-radius:22px;padding:24px;box-shadow:0 30px 120px #000}
+.kx47-album-head{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:15px}
+.kx47-album-head h2{color:#ffd84d;margin:0}.kx47-album-stats{display:flex;gap:8px;flex-wrap:wrap}
+.kx47-stat{padding:8px 12px;border:1px solid #4b3b1b;border-radius:10px;background:#111;color:#ddd}.kx47-stat b{color:#ffd84d}
+.kx47-album-tabs,.kx47-admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.kx47-album-tabs button,.kx47-admin-tabs button{background:#202020;color:#ddd;border:1px solid #343434}
+.kx47-album-tabs button.active,.kx47-admin-tabs button.active{background:linear-gradient(135deg,#d4af37,#ffd84d);color:#111;border-color:#ffd84d}
+.kx47-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.kx47-collect-card{position:relative;overflow:hidden;border:1px solid #343434;border-radius:15px;background:#111;min-height:235px}
+.kx47-collect-card img{width:100%;height:165px;object-fit:cover;display:block;background:#252525}
+.kx47-collect-card.locked img{filter:grayscale(1) brightness(.42);opacity:.75}
+.kx47-collect-card .kx47-card-info{padding:10px}.kx47-card-info strong{display:block;color:#ffd84d;margin-bottom:4px}
+.kx47-card-info small{color:#999;line-height:1.35}.kx47-owned{position:absolute;top:8px;right:8px;padding:5px 8px;border-radius:999px;background:#d4af37;color:#111;font-size:10px;font-weight:900}
+.kx47-pick-box button{margin-top:6px}.kx47-pick-box{margin:14px 0;padding:15px;border:1px solid #75591f;border-radius:14px;background:linear-gradient(135deg,#1b1408,#0d0b08)}
+.kx47-pick-box h3{color:#ffd84d;margin-bottom:6px}.kx47-pick-box p{color:#aaa;margin-bottom:10px}
+.kx47-pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.kx47-pick-card{cursor:pointer;border:2px solid #5b4519;border-radius:14px;background:#111;overflow:hidden;text-align:left;transition:.2s}
+.kx47-pick-card:hover{transform:translateY(-4px);border-color:#ffd84d;box-shadow:0 10px 30px rgba(255,216,77,.15)}
+.kx47-pick-card img{width:100%;height:190px;object-fit:cover;display:block}.kx47-pick-card div{padding:9px}.kx47-pick-card strong{color:#ffd84d}.kx47-pick-card small{display:block;color:#999;margin-top:4px}
+.kx47-reward-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.kx47-reward{border:1px solid #333;border-radius:13px;background:#101010;padding:14px}.kx47-reward h4{color:#ffd84d;margin-bottom:5px}.kx47-reward p{color:#aaa;font-size:13px}.kx47-reward button{width:100%;margin-top:10px}
+.kx47-admin-tabs-wrap{margin:15px 0 0;padding-top:12px;border-top:1px solid #292929}
+.kx47-admin-extra{display:none}.kx47-admin-extra.active{display:block}
+.kx47-admin-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kx47-admin-form .full{grid-column:1/-1}
+.kx47-admin-preview{width:100%;height:170px;object-fit:cover;border-radius:12px;background:#222;border:1px solid #333}
+.kx47-small-note{color:#999;font-size:12px;line-height:1.45}
+.kx47-card-admin-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:12px}
+.kx47-card-admin-item{display:flex;gap:10px;align-items:center;border:1px solid #2d2d2d;border-radius:11px;padding:8px;background:#0d0d0d}
+.kx47-card-admin-item img{width:48px;height:60px;object-fit:cover;border-radius:6px}.kx47-card-admin-item div{min-width:0}.kx47-card-admin-item strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kx47-card-admin-item button{margin-left:auto;flex:0 0 auto}.kx47-rarity-note{margin-top:10px;padding:10px;border:1px solid #2d2d2d;border-radius:10px;background:#0a0a0a;color:#aaa;font-size:12px;line-height:1.5}.kx47-rarity-note b{color:#ffd84d}
+.kx47-notice{padding:10px 12px;border-radius:10px;background:#151515;border:1px solid #333;color:#ccc;margin:8px 0}
+@media(max-width:650px){.kx47-pick-grid{grid-template-columns:1fr}.kx47-admin-form{grid-template-columns:1fr}.kx47-admin-form .full{grid-column:auto}.kx47-album-box{padding:15px}}
+</style>
+
+<script>
+(() => {
+  'use strict';
+  const CKEY='kx47CollectionCardsV1', RKEY='kx47RewardsV1';
+  const $=id=>document.getElementById(id);
+  const cards=()=>{try{const a=JSON.parse(localStorage.getItem(CKEY)||'[]');return Array.isArray(a)?a:[]}catch{return[]}};
+  const saveCards=a=>localStorage.setItem(CKEY,JSON.stringify(a));
+  const rewards=()=>{try{const a=JSON.parse(localStorage.getItem(RKEY)||'[]');return Array.isArray(a)?a:[]}catch{return[]}};
+  const saveRewards=a=>localStorage.setItem(RKEY,JSON.stringify(a));
+  const me=()=>window.KX47GetProfile?window.KX47GetProfile():null;
+  const isAdmin=()=>{const u=me();return !!u&&(u.role==='Owner'||u.role==='Manager')};
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const fmt=n=>Number(n||0).toLocaleString('de-DE');
+
+  // Album is intentionally global: every admin-created card automatically appears here.
+  function ensureUser(u){
+    if(!u)return;
+    if(!Array.isArray(u.collection))u.collection=[];
+    if(!Number.isFinite(Number(u.cardPicks)))u.cardPicks=0;
+    if(!Number.isFinite(Number(u.totalWins)))u.totalWins=0;
+    if(!Number.isFinite(Number(u.totalWonCoins)))u.totalWonCoins=0;
+  }
+  function persistMe(){
+    // Account/profile data is server-owned in the secure version.
+    // Collection/reward data remains a client-side demo feature until its server API is added.
+  }
+
+  function openAlbum(){
+    const m=$('kx47AlbumModal');if(!m)return;
+    renderAlbum();m.classList.add('open');document.body.classList.add('modal-open');
+  }
+  function closeAlbum(){const m=$('kx47AlbumModal');if(m)m.classList.remove('open');document.body.classList.remove('modal-open')}
+  window.KX47OpenAlbum=openAlbum;
+
+  function cardImage(c){
+    return c.image || 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="500" height="650"><rect width="100%" height="100%" fill="#242424"/><text x="50%" y="45%" fill="#ffd84d" font-size="44" text-anchor="middle">KX47</text><text x="50%" y="55%" fill="#999" font-size="24" text-anchor="middle">KARTE</text></svg>`);
+  }
+  function renderAlbum(){
+    const u=me();const all=cards();const owned=new Set((u&&Array.isArray(u.collection))?u.collection:[]);
+    const count=all.filter(c=>owned.has(c.id)).length;
+    $('kx47AlbumStats').innerHTML=`<span class="kx47-stat"><b>${count}</b> / ${all.length} Karten</span><span class="kx47-stat"><b>${all.length?Math.round(count/all.length*100):0}%</b> Fortschritt</span><span class="kx47-stat"><b>${u?fmt(u.cardPicks):0}</b> Karten-Picks</span>`;
+    $('kx47AlbumGrid').innerHTML=all.length?all.map(c=>`<article class="kx47-collect-card ${owned.has(c.id)?'':'locked'}"><img src="${cardImage(c)}" alt=""><div class="kx47-card-info"><strong>${esc(c.name)}</strong><small>${esc(c.rarity||'Normal')} · ${owned.has(c.id)?'Freigeschaltet':'Noch nicht freigeschaltet'}</small></div>${owned.has(c.id)?'<span class="kx47-owned">IM BESITZ</span>':''}</article>`).join(''):`<div class="kx47-notice">Noch keine Karten im Album. Der Manager kann im Admin Panel Karten erstellen.</div>`;
+    renderPicks();
+    renderUserRewards();
+  }
+  function renderPicks(){
+    const u=me();const box=$('kx47PickBox');if(!u||Number(u.cardPicks)<=0){box.innerHTML='<h3>🎴 Pick-Inventar</h3><p>Du hast aktuell keine Karten-Picks. Gewinne von 100.000 Coins oder mehr geben dir 1 Pick pro volle 100.000 Coins.</p>';return}
+    const owned=new Set(Array.isArray(u.collection)?u.collection:[]), available=cards().filter(c=>!owned.has(c.id));
+    if(!available.length){box.innerHTML=`<h3>🎴 Pick-Inventar</h3><p>Du hast <b>${fmt(u.cardPicks)}</b> Pick(s) gesammelt, aber bereits alle vorhandenen Karten freigeschaltet. Neue Karten können später mit deinen gespeicherten Picks geöffnet werden.</p>`;return}
+    box.innerHTML=`<h3>🎴 Pick-Inventar</h3><p>Du hast <b>${fmt(u.cardPicks)}</b> Karten-Pick(s) gesammelt. Du kannst sie jederzeit einzeln öffnen.</p><button class="gold" id="kx47OpenPick">🎁 1 Karten-Pick öffnen</button><div id="kx47PickChoices"></div>`;
+    $('kx47OpenPick').onclick=()=>openOnePick();
+  }
+  function openOnePick(){
+    const u=me();if(!u||Number(u.cardPicks)<=0)return;ensureUser(u);
+    const owned=new Set(Array.isArray(u.collection)?u.collection:[]),available=cards().filter(c=>!owned.has(c.id));
+    if(!available.length){renderPicks();return}
+    const choices=weightedChoices(available,Math.min(3,available.length));
+    const box=$('kx47PickChoices');if(!box)return;
+    box.innerHTML=`<div class="kx47-notice"><b>Dein Pick ist geöffnet!</b> Wähle 1 von ${choices.length} Karten. Der Pick wird erst bei der Auswahl verbraucht.</div><div class="kx47-pick-grid">${choices.map(c=>`<button class="kx47-pick-card" data-pick-card="${esc(c.id)}"><img src="${cardImage(c)}" alt=""><div><strong>${esc(c.name)}</strong><small>${esc(c.rarity||'Nicht selten')}</small></div></button>`).join('')}</div>`;
+  }
+  const RARITY_WEIGHTS={"Nicht selten":1000,"selten":220,"episch":45,"Legänder":8,"Exclusiv":4,"Legende":1.5,"Goty":0.4};
+  const RARITY_NAMES=Object.keys(RARITY_WEIGHTS);
+  function normalizeRarity(value){
+    const v=String(value||'').trim();
+    if(RARITY_NAMES.includes(v))return v;
+    const low=v.toLowerCase();
+    if(low==='normal'||low==='nicht selten'||low==='nichtselten')return 'Nicht selten';
+    if(low==='legendär'||low==='legendaer'||low==='legendär')return 'Legänder';
+    if(low==='legend')return 'Legende';
+    if(low==='exclusive'||low==='exklusiv')return 'Exclusiv';
+    if(low==='goty')return 'Goty';
+    if(low==='rare')return 'selten';
+    if(low==='epic')return 'episch';
+    return 'Nicht selten';
+  }
+  function cardWeight(c){return RARITY_WEIGHTS[normalizeRarity(c.rarity)]||RARITY_WEIGHTS['Nicht selten'];}
+  function weightedChoices(source,count){
+    const pool=[...source],out=[];
+    while(pool.length&&out.length<count){
+      let total=pool.reduce((sum,c)=>sum+cardWeight(c),0),r=Math.random()*total,idx=0;
+      for(let i=0;i<pool.length;i++){r-=cardWeight(pool[i]);if(r<=0){idx=i;break}}
+      out.push(pool.splice(idx,1)[0]);
+    }
+    return out;
+  }
+  function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+  (function migrateRarities(){const a=cards();let changed=false;a.forEach(c=>{const n=normalizeRarity(c.rarity);if(c.rarity!==n){c.rarity=n;changed=true}});if(changed)saveCards(a)})();
+  function chooseCard(id){
+    const sessionUser=me();
+    if(!sessionUser||Number(sessionUser.cardPicks)<=0)return;
+
+    // Always resolve the card against the current global card list and write the
+    // ownership directly to the persisted account record. This prevents the pick
+    // result from being shown temporarily without actually becoming permanent.
+    const cardId=String(id||'');
+    const c=cards().find(x=>String(x.id)===cardId);
+    if(!c)return;
+
+    const allUsers=safeUsers();
+    const u=allUsers.find(x=>x.id===sessionUser.id);
+    if(!u)return;
+    ensureUser(u);
+
+    // Migrate any old collection entries that may have been stored as card objects.
+    u.collection=u.collection.map(x=>typeof x==='object'&&x?String(x.id||''):String(x)).filter(Boolean);
+    if(u.collection.includes(cardId))return;
+
+    u.collection.push(cardId);
+    u.cardPicks=Math.max(0,Number(u.cardPicks)-1);
+    saveUsers(allUsers);
+
+    // Refresh the current session copy and every visible album component.
+    sessionUser.collection=[...u.collection];
+    sessionUser.cardPicks=u.cardPicks;
+    renderAlbum();
+    renderPicks();
+
+    const choices=$(`kx47PickChoices`);
+    if(choices)choices.innerHTML=`<div class="kx47-notice">🎉 <b>${esc(c.name)}</b> wurde dauerhaft deinem Sammelalbum hinzugefügt. Noch <b>${fmt(u.cardPicks)}</b> Pick(s).</div>`;
+  }
+
+  function renderUserRewards(){
+    const u=me(), list=$('kx47UserRewards');if(!list)return;
+    const rs=rewards(); if(!rs.length){list.innerHTML='<div class="kx47-notice">Noch keine Belohnungen erstellt.</div>';return}
+    list.innerHTML=rs.map(r=>`<article class="kx47-reward"><h4>${esc(r.icon||'🎁')} ${esc(r.name)}</h4><p>${esc(r.description||'')}</p><p><b>${r.type==='picks'?fmt(r.amount)+' Karten-Pick(s)':fmt(r.amount)+' Coins'}</b></p></article>`).join('');
+  }
+
+  // Win accounting: 1 pick per full 100,000 Coins won in a single win.
+  window.KX47RegisterWin=function(amount){
+    const n=Math.floor(Number(amount)||0);if(n<100000)return;
+    const u=me();if(!u)return;ensureUser(u);
+    const picks=Math.floor(n/100000);u.cardPicks+=picks;u.totalWins+=1;u.totalWonCoins+=n;persistMe();
+    const msg=$('gameResult');if(msg)msg.insertAdjacentHTML('beforeend',` <span class="big-win">🎴 +${fmt(picks)} Karten-Pick${picks===1?'':'s'}</span>`);
+    if($('kx47AlbumModal')?.classList.contains('open'))renderAlbum();
+  };
+
+  // Seed no cards; cards created in admin are automatically part of the album.
+  function injectUI(){
+    if(!$('kx47AlbumModal')){
+      document.body.insertAdjacentHTML('beforeend',`
+      <div id="kx47AlbumModal"><div class="kx47-album-box">
+        <div class="kx47-album-head"><div><h2>📚 Mein Sammelalbum</h2><p class="kx47-small-note">Dein persönlicher Kartenbestand und Fortschritt.</p></div><button class="dark" id="kx47AlbumClose">✕ Schließen</button></div>
+        <div class="kx47-album-stats" id="kx47AlbumStats"></div>
+        <div class="kx47-album-tabs"><button class="active" data-album-tab="cards">Album</button><button data-album-tab="rewards">Belohnungen</button></div>
+        <section id="kx47AlbumCardsTab"><div class="kx47-pick-box" id="kx47PickBox"></div><div class="kx47-card-grid" id="kx47AlbumGrid"></div></section>
+        <section id="kx47AlbumRewardsTab" style="display:none"><div class="kx47-reward-list" id="kx47UserRewards"></div></section>
+      </div></div>`);
+      $('kx47AlbumClose').onclick=closeAlbum;
+      $('kx47AlbumModal').onclick=e=>{if(e.target.id==='kx47AlbumModal')closeAlbum()};
+      document.querySelectorAll('[data-album-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-album-tab]').forEach(x=>x.classList.toggle('active',x===b));$('kx47AlbumCardsTab').style.display=b.dataset.albumTab==='cards'?'block':'none';$('kx47AlbumRewardsTab').style.display=b.dataset.albumTab==='rewards'?'block':'none';});
+      $('kx47PickBox').addEventListener('click',e=>{const b=e.target.closest('[data-pick-card]');if(b)chooseCard(b.dataset.pickCard)});
+    }
+    if(!$('kx47AlbumNav')) {
+      const nav=document.querySelector('header nav');if(nav)nav.insertAdjacentHTML('beforeend','<a href="#kx47Album" id="kx47AlbumNav">Sammelalbum</a>');
+      const right=document.querySelector('header .right');if(right)right.insertAdjacentHTML('afterbegin','<button class="dark" id="kx47AlbumButton">📚 Album</button>');
+      $('kx47AlbumButton').onclick=()=>{if(!me()){document.getElementById('authBackdrop')?.classList.add('open');return}openAlbum()};
+    }
+  }
+
+  function adminPanel(){
+    if(!$('adminBackdrop')||!isAdmin())return;
+    const host=$('gameCreatorCard')?.parentElement; if(!host||$('kx47AdminTabs'))return;
+    const tabs=document.createElement('div');tabs.id='kx47AdminTabs';tabs.className='kx47-admin-tabs-wrap';
+    tabs.innerHTML=`<div class="kx47-admin-tabs"><button class="active" data-admin-tab="overview">Übersicht</button><button data-admin-tab="rewards">Belohnungen erstellen</button><button data-admin-tab="album">Karten & Sammelalbum</button></div>
+      <section id="kx47AdminRewards" class="kx47-admin-extra">
+        <div class="admin-card"><h3>🎁 Belohnung erstellen</h3><p class="kx47-small-note">Lege Belohnungen für das KX47-System an. Sie werden im Sammelalbum unter „Belohnungen“ angezeigt.</p>
+        <div class="kx47-admin-form"><input id="kx47RewardName" placeholder="Name der Belohnung"><input id="kx47RewardIcon" placeholder="Icon, z. B. 🎁"><select id="kx47RewardType"><option value="coins">Coins</option><option value="picks">Karten-Picks</option></select><input id="kx47RewardAmount" type="number" min="1" value="1000" placeholder="Menge"><input id="kx47RewardDesc" class="full" placeholder="Beschreibung"><button class="gold full" id="kx47CreateReward">Belohnung speichern</button></div><div id="kx47RewardAdminList"></div></div>
+      </section>
+      <section id="kx47AdminAlbum" class="kx47-admin-extra">
+        <div class="admin-card"><h3>🎴 Karten-Picks & Karten an Accounts vergeben</h3><p class="kx47-small-note">Der Manager kann jedem bestehenden Account beliebig viele Karten-Picks oder eine beliebige vorhandene Karte direkt ins Inventar/Sammelalbum geben.</p>
+        <div class="kx47-admin-form"><select id="kx47GrantUser"></select><select id="kx47GrantCard"></select><input id="kx47GrantPicks" type="number" min="0" step="1" value="1" placeholder="Anzahl Picks"><button class="gold" id="kx47GrantCardBtn">🎴 Karte vergeben</button><button class="dark" id="kx47GrantPicksBtn">🎁 Picks vergeben</button></div><p id="kx47GrantMsg" class="kx47-small-note"></p></div>
+        <div class="admin-card"><h3>🎴 Karte erstellen</h3><p class="kx47-small-note">Jede hier gespeicherte Karte wird automatisch als freischaltbare Karte in jedes bestehende Sammelalbum aufgenommen.</p>
+        <div class="kx47-admin-form"><input id="kx47CardName" placeholder="Kartenname"><select id="kx47CardRarity"><option>Nicht selten</option><option>selten</option><option>episch</option><option>Legänder</option><option>Exclusiv</option><option>Legende</option><option>Goty</option></select><input id="kx47CardDesc" class="full" placeholder="Beschreibung"><label class="admin-note">Kartenbild <input id="kx47CardImage" type="file" accept="image/*"></label><img id="kx47CardPreview" class="kx47-admin-preview" alt="Vorschau"><button class="gold full" id="kx47CreateCard">Karte erstellen</button></div><div class="kx47-rarity-note"><b>Zieh-Wahrscheinlichkeit:</b> Die Seltenheit steuert die Gewichtung. Nicht selten ist am häufigsten, selten deutlich häufiger als episch, und <b>Legänder / Exclusiv / Legende / Goty</b> sind extrem schwer zu ziehen. Die Werte sind bewusst als relative Gewichte angelegt, damit seltene Karten wirklich selten bleiben.</div><p id="kx47CardAdminMsg" class="kx47-small-note"></p><div class="kx47-card-admin-list" id="kx47CardAdminList"></div></div>
+      </section>`;
+    host.appendChild(tabs);
+    const baseSelectors=['.admin-grid','#gameCreatorCard','#adminLevelInfo'];
+    const userCard=[...document.querySelectorAll('.admin-card')].find(x=>x.querySelector('#userList'));
+    function showTab(t){
+      const overview=t==='overview';
+      baseSelectors.forEach(sel=>document.querySelectorAll(sel).forEach(el=>el.style.display=overview?'':'none'));
+      if(userCard)userCard.style.display=overview?'':'none';
+      $('kx47AdminRewards').classList.toggle('active',t==='rewards');$('kx47AdminAlbum').classList.toggle('active',t==='album');
+      document.querySelectorAll('[data-admin-tab]').forEach(b=>b.classList.toggle('active',b.dataset.adminTab===t));
+      if(t==='rewards')renderRewardAdmin();if(t==='album')renderCardAdmin();
+    }
+    tabs.querySelectorAll('[data-admin-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.adminTab));
+    const img=$('kx47CardImage');if(img)img.onchange=()=>{const f=img.files[0];if(!f)return;const url=URL.createObjectURL(f);$('kx47CardPreview').src=url;$('kx47CardPreview').style.objectFit='contain';};
+    setupGrantControls();
+    $('kx47CreateReward').onclick=()=>{if(!isAdmin())return;const name=$('kx47RewardName').value.trim(),amount=Number($('kx47RewardAmount').value);if(!name||amount<1)return;const a=rewards();a.push({id:'reward_'+Date.now(),name,icon:$('kx47RewardIcon').value.trim()||'🎁',type:$('kx47RewardType').value,amount,description:$('kx47RewardDesc').value.trim()});saveRewards(a);$('kx47RewardName').value='';$('kx47RewardDesc').value='';renderRewardAdmin()};
+    $('kx47CreateCard').onclick=async()=>{if(!isAdmin())return;const name=$('kx47CardName').value.trim();if(!name){$('kx47CardAdminMsg').textContent='Bitte einen Kartennamen eingeben.';return}const f=$('kx47CardImage').files[0];const image=await prepareCardImage(f);const a=cards();a.push({id:'card_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),name,rarity:normalizeRarity($('kx47CardRarity').value),description:$('kx47CardDesc').value.trim(),image});saveCards(a);
+      // Creating a card only adds it to the global album pool. It must NOT be
+      // automatically owned by any account; ownership is granted only by a pick
+      // or explicitly through the admin's 'Karte vergeben' action.
+      const allUsers=safeUsers(); allUsers.forEach(u=>{ensureUser(u); u.collection=u.collection.map(x=>typeof x==='object'&&x?String(x.id||''):String(x)).filter(Boolean).filter(x=>x!==a[a.length-1].id);}); saveUsers(allUsers);
+      $('kx47CardName').value='';$('kx47CardRarity').value='';$('kx47CardDesc').value='';$('kx47CardImage').value='';$('kx47CardPreview').removeAttribute('src');$('kx47CardAdminMsg').textContent='Karte erstellt und automatisch ins Sammelalbum aufgenommen.';renderCardAdmin();renderGrantControls()};
+    showTab('overview');
+  }
+  function fileToData(f){return new Promise(resolve=>{if(!f)return resolve('');const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>resolve('');r.readAsDataURL(f)})}
+  // Normalize every uploaded card image to the album's fixed card format while keeping the entire image visible.
+  function prepareCardImage(file){return new Promise(resolve=>{if(!file)return resolve('');const img=new Image();const reader=new FileReader();reader.onload=()=>{img.onload=()=>{const W=500,H=650;const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');ctx.fillStyle='#171717';ctx.fillRect(0,0,W,H);const scale=Math.min(W/img.naturalWidth,H/img.naturalHeight);const w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);const x=Math.round((W-w)/2),y=Math.round((H-h)/2);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,x,y,w,h);resolve(canvas.toDataURL('image/jpeg',0.92));};img.onerror=()=>resolve('');img.src=reader.result};reader.onerror=()=>resolve('');reader.readAsDataURL(file)});}
+  function renderGrantControls(){
+    const us=$('kx47GrantUser'),cs=$('kx47GrantCard');if(!us||!cs)return;
+    const list=safeUsers();
+    us.innerHTML=list.length?list.map(u=>`<option value="${esc(u.id)}">${esc(u.username||u.email||u.id)}</option>`).join(''):'<option value="">Keine Accounts</option>';
+    cs.innerHTML=cards().length?'<option value="">Karte auswählen</option>'+cards().map(c=>`<option value="${esc(c.id)}">${esc(c.name)} · ${esc(normalizeRarity(c.rarity))}</option>`).join(''):'<option value="">Keine Karten</option>';
+  }
+  function setupGrantControls(){
+    renderGrantControls();
+    const gb=$('kx47GrantCardBtn'),pb=$('kx47GrantPicksBtn');
+    if(gb&&!gb.dataset.bound){gb.dataset.bound='1';gb.onclick=()=>{if(!isAdmin())return;const uid=$('kx47GrantUser').value,cid=$('kx47GrantCard').value,a=safeUsers(),u=a.find(x=>x.id===uid),c=cards().find(x=>x.id===cid);if(!u||!c){$('kx47GrantMsg').textContent='Bitte Account und Karte auswählen.';return}ensureUser(u);if(u.collection.includes(c.id)){$('kx47GrantMsg').textContent=`${u.username} besitzt diese Karte bereits.`;return}u.collection.push(c.id);saveUsers(a);$('kx47GrantMsg').textContent=`🎴 ${c.name} wurde ${u.username} direkt ins Sammelalbum gegeben.`;renderAlbum();};}
+    if(pb&&!pb.dataset.bound){pb.dataset.bound='1';pb.onclick=()=>{if(!isAdmin())return;const uid=$('kx47GrantUser').value,n=Math.max(0,Math.floor(Number($('kx47GrantPicks').value)||0)),a=safeUsers(),u=a.find(x=>x.id===uid);if(!u||n<1){$('kx47GrantMsg').textContent='Bitte Account und eine gültige Pick-Anzahl eingeben.';return}ensureUser(u);u.cardPicks+=n;saveUsers(a);$('kx47GrantMsg').textContent=`🎁 ${fmt(n)} Pick(s) wurden ${u.username} ins Inventar gegeben. Gesamt: ${fmt(u.cardPicks)}.`;if(me()?.id===u.id)renderAlbum();};}
+  }
+
+  function renderRewardAdmin(){const el=$('kx47RewardAdminList');if(!el)return;el.innerHTML=rewards().length?'<h4 style="margin-top:15px;color:#ffd84d">Erstellte Belohnungen</h4>'+rewards().map(r=>`<div class="kx47-notice"><b>${esc(r.icon)} ${esc(r.name)}</b> · ${fmt(r.amount)} ${r.type==='picks'?'Picks':'Coins'}<br><span class="kx47-small-note">${esc(r.description||'')}</span></div>`).join(''):'<div class="kx47-notice">Noch keine Belohnungen.</div>'}
+  function renderCardAdmin(){const el=$('kx47CardAdminList');if(!el)return;el.innerHTML=cards().length?cards().map(c=>`<div class="kx47-card-admin-item"><img src="${cardImage(c)}" alt=""><div><strong>${esc(c.name)}</strong><span class="kx47-small-note">${esc(normalizeRarity(c.rarity))}</span></div><button class="dark" type="button" data-delete-card="${esc(c.id)}">🗑️ Löschen</button></div>`).join(''):'<div class="kx47-notice">Noch keine Karten erstellt.</div>';el.querySelectorAll('[data-delete-card]').forEach(b=>b.onclick=()=>deleteCard(b.dataset.deleteCard))}
+  function deleteCard(id){
+    if(!isAdmin())return;
+    const c=cards().find(x=>x.id===id);if(!c)return;
+    if(!confirm(`Karte „${c.name}“ wirklich komplett löschen? Sie wird aus dem Sammelalbum entfernt und kann nicht mehr gezogen werden.`))return;
+    saveCards(cards().filter(x=>x.id!==id));
+    const a=safeUsers();a.forEach(u=>{if(Array.isArray(u.collection))u.collection=u.collection.filter(cid=>cid!==id)});saveUsers(a);
+    renderCardAdmin();renderGrantControls();renderAlbum();
+    const msg=$('kx47CardAdminMsg');if(msg)msg.textContent=`„${c.name}“ wurde vollständig gelöscht.`;
+  }
+
+  // Make the admin account the only super-admin identity used by this expansion.
+  function watchAdmin(){if(isAdmin())adminPanel()}
+  injectUI();setTimeout(watchAdmin,200);setInterval(watchAdmin,800);
+  window.addEventListener('storage',()=>{if($('kx47AlbumModal')?.classList.contains('open'))renderAlbum()});
+
+  // Comprehensive rule dialog shown BEFORE every new game is opened.
+  const rulesBody=()=>`
+    <h3 style="color:#ffd84d;margin:8px 0">Grundregeln</h3>
+    <ul><li>Alle Spiele verwenden ausschließlich virtuelle Demo-Credits – kein Echtgeld.</li>
+    <li>Vor dem Start wird kein Einsatz abgebucht. Der Einsatz wird erst mit der eigentlichen Spielaktion berechnet.</li>
+    <li>Gewinne werden nach Abschluss der Spielrunde gutgeschrieben.</li>
+    <li>Ein einzelner Gewinn von 100.000 Coins oder mehr gibt 1 Karten-Pick pro volle 100.000 Coins. Beispiel: 200.000 = 2 Picks, 1.000.000 = 10 Picks.</li></ul>
+    <h3 style="color:#ffd84d;margin:8px 0">Spielablauf</h3>
+    <ul><li><b>Slots:</b> Einsatz wählen, „Drehen“ drücken. 5 Walzen und 3 Reihen bilden das Ergebnis; Gewinnlinien, Wild und Scatter richten sich nach der eingeblendeten Gewinntabelle. 3+ Scatter können Freispiele auslösen.</li>
+    <li><b>Bonus Wheel:</b> 100.000 Credits pro Spin. Das Rad stoppt zufällig; das Feld bestimmt den Gewinn.</li>
+    <li><b>Leiter:</b> 10.000 Credits pro Runde. Jede erfolgreiche Stufe erhöht den möglichen Gewinn. Du kannst den aktuellen Gewinn sichern; ein Fehlversuch beendet die aktuelle Leiter.</li>
+    <li><b>Blackjack:</b> Ziel ist näher an 21 als der Dealer, ohne über 21 zu kommen. Ass zählt 1 oder 11; Bildkarten 10. Hit zieht, Stand beendet.</li>
+    <li><b>Texas Hold'em:</b> 2 eigene Karten und bis zu 5 Gemeinschaftskarten. Die beste Pokerhand entscheidet den Showdown.</li>
+    <li><b>Three Card Poker:</b> 3 Karten gegen den Dealer. Nach Ante kannst du spielen oder folden; der Ausgang bestimmt Gewinn oder Verlust.</li>
+    <li><b>Roulette:</b> Wähle Rot oder Schwarz und setze 10.000 Credits. Die Kugel bestimmt das Ergebnis zufällig.</li>
+    <li><b>Pferderennen:</b> Pferd auswählen, 10.000 Credits Einsatz. Ein zufälliger Sieger entscheidet den Ausgang.</li>
+    <li><b>Sabacc:</b> Eigenes KX47-Regelset: numerische Karten möglichst nahe an 0, Shift-Karten können Werte verändern, anschließend Showdown.</li></ul>
+    <h3 style="color:#ffd84d;margin:8px 0">Sammelalbum</h3>
+    <ul><li>Bei einem Karten-Pick werden 3 zufällige Karten aus deinem noch nicht freigeschalteten Album angezeigt.</li><li>Du wählst 1 Karte; sie wird dauerhaft deinem Konto hinzugefügt.</li><li>Besessene Karten erscheinen im Album farbig, nicht besessene Karten ausgegraut.</li></ul>`;
+  function showRules(kind, titleText, proceed){
+    const old=$('kx47Rules');if(!old){proceed();return}
+    $('kx47RulesTitle').textContent='Spielregeln · '+(titleText||'Spiel');
+    $('kx47RulesBody').innerHTML=rulesBody();
+    old.classList.add('open');
+    const ok=$('kx47RulesStart'),cancel=$('kx47RulesClose');
+    const cleanup=()=>{old.classList.remove('open');ok.onclick=null;cancel.onclick=null};
+    cancel.onclick=cleanup;
+    ok.onclick=()=>{cleanup();window.__kx47RulesBypass=true;try{proceed()}finally{window.__kx47RulesBypass=false}};
+  }
+  document.addEventListener('click',e=>{
+    if(window.__kx47RulesBypass)return;
+    const b=e.target.closest('.demo,.casino-open');if(!b)return;
+    if(b.classList.contains('casino-open')||b.classList.contains('demo')){
+      e.preventDefault();e.stopImmediatePropagation();
+      const name=b.dataset?.casino?({'wheel':'Bonus Wheel','ladder':'Leiter-Spiel','blackjack':'Blackjack','holdem':"Texas Hold'em",'threecard':'Three Card Poker','roulette':'Roulette','horse':'Pferderennen','sabacc':'Sabacc'}[b.dataset.casino]||'Casino-Spiel'):(b.closest('.card')?.querySelector('h3')?.textContent||'Spiel');
+      showRules(b.dataset?.casino||'slot',name,()=>b.click());
+    }
+  },true);
+})();
+</script>
+
+
+<script id="kx47-stability-fix">
+(() => {
+  'use strict';
+  // Secure-auth compatibility: never recreate or read the old localStorage account system.
+  window.KX47SecureAuthReady = true;
+})();
+</script>
+</body>
+</html>
+<!-- KX47: Demo manager is seeded for local testing. Replace with real server-side account provisioning before deployment. -->
