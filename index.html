@@ -2545,7 +2545,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
       // local-only version and the server table is empty, copy them to Supabase.
       if(serverCards.length===0 && localCards.length && isAdmin()){
         for(const c of localCards){
-          const {error:insErr}=await client.rpc('kx47_admin_create_card_v2',{
+          const {error:insErr}=await client.rpc('kx47_create_card_persist',{
             p_id:String(c.id),p_name:String(c.name||''),p_rarity:normalizeRarity(c.rarity),
             p_description:String(c.description||''),p_image:String(c.image||'')
           });
@@ -2794,7 +2794,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
         const f=$('kx47CardImage').files[0];
         const image=await prepareCardImage(f);
         const card={id:'card_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),name,rarity:normalizeRarity($('kx47CardRarity').value),description:$('kx47CardDesc').value.trim(),image};
-        const {data,error}=await client.rpc('kx47_admin_create_card_v2',{p_id:card.id,p_name:card.name,p_rarity:card.rarity,p_description:card.description,p_image:card.image});
+        const {data,error}=await client.rpc('kx47_create_card_persist',{p_id:card.id,p_name:card.name,p_rarity:card.rarity,p_description:card.description,p_image:card.image});
         if(error)throw error;
         const saved=data&&Array.isArray(data)?data[0]:data;
         const local=cards().filter(c=>String(c.id)!==String(card.id));
