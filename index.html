@@ -2644,7 +2644,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
         <div class="admin-card"><h3>🎴 Karten-Picks & Karten an Accounts vergeben</h3><p class="kx47-small-note">Der Manager kann jedem bestehenden Account beliebig viele Karten-Picks oder eine beliebige vorhandene Karte direkt ins Inventar/Sammelalbum geben.</p>
         <div class="kx47-admin-form"><select id="kx47GrantUser"></select><select id="kx47GrantCard"></select><input id="kx47GrantPicks" type="number" min="0" step="1" value="1" placeholder="Anzahl Picks"><button class="gold" id="kx47GrantCardBtn">🎴 Karte vergeben</button><button class="dark" id="kx47GrantPicksBtn">🎁 Picks vergeben</button></div><p id="kx47GrantMsg" class="kx47-small-note"></p></div>
         <div class="admin-card"><h3>🎴 Karte erstellen</h3><p class="kx47-small-note">Jede hier gespeicherte Karte wird automatisch als freischaltbare Karte in jedes bestehende Sammelalbum aufgenommen.</p>
-        <div class="kx47-admin-form"><input id="kx47CardName" placeholder="Kartenname"><select id="kx47CardRarity"><option>Nicht selten</option><option>selten</option><option>episch</option><option>Legänder</option><option>Exclusiv</option><option>Legende</option><option>Goty</option></select><input id="kx47CardDesc" class="full" placeholder="Beschreibung"><label class="admin-note">Kartenbild <input id="kx47CardImage" type="file" accept="image/*"></label><img id="kx47CardPreview" class="kx47-admin-preview" alt="Vorschau"><button class="gold full" id="kx47CreateCard">Karte erstellen</button></div><div class="kx47-rarity-note"><b>Zieh-Wahrscheinlichkeit:</b> Die Seltenheit steuert die Gewichtung. Nicht selten ist am häufigsten, selten deutlich häufiger als episch, und <b>Legänder / Exclusiv / Legende / Goty</b> sind extrem schwer zu ziehen. Die Werte sind bewusst als relative Gewichte angelegt, damit seltene Karten wirklich selten bleiben.</div><p id="kx47CardAdminMsg" class="kx47-small-note"></p><div class="kx47-card-admin-list" id="kx47CardAdminList"></div></div>
+        <div class="kx47-admin-form"><input id="kx47CardName" placeholder="Kartenname"><select id="kx47CardRarity"><option>Nicht selten</option><option>selten</option><option>episch</option><option>Legänder</option><option>Exclusiv</option><option>Legende</option><option>Goty</option></select><input id="kx47CardDesc" class="full" placeholder="Beschreibung"><label class="admin-note">Kartenbild <input id="kx47CardImage" type="file" accept="image/*"></label><img id="kx47CardPreview" class="kx47-admin-preview" alt="Vorschau"><button type="button" class="gold full" id="kx47CreateCard">Karte erstellen</button></div><div class="kx47-rarity-note"><b>Zieh-Wahrscheinlichkeit:</b> Die Seltenheit steuert die Gewichtung. Nicht selten ist am häufigsten, selten deutlich häufiger als episch, und <b>Legänder / Exclusiv / Legende / Goty</b> sind extrem schwer zu ziehen. Die Werte sind bewusst als relative Gewichte angelegt, damit seltene Karten wirklich selten bleiben.</div><p id="kx47CardAdminMsg" class="kx47-small-note"></p><div class="kx47-card-admin-list" id="kx47CardAdminList"></div></div>
       </section>`;
     host.appendChild(tabs);
     const baseSelectors=['.admin-grid','#gameCreatorCard','#adminLevelInfo'];
@@ -2662,34 +2662,37 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
     setupGrantControls();
     refreshServerCards().then(()=>{renderCardAdmin(); renderGrantControls();}).catch(()=>{});
     $('kx47CreateReward').onclick=()=>{if(!isAdmin())return;const name=$('kx47RewardName').value.trim(),amount=Number($('kx47RewardAmount').value);if(!name||amount<1)return;const a=rewards();a.push({id:'reward_'+Date.now(),name,icon:$('kx47RewardIcon').value.trim()||'🎁',type:$('kx47RewardType').value,amount,description:$('kx47RewardDesc').value.trim()});saveRewards(a);$('kx47RewardName').value='';$('kx47RewardDesc').value='';renderRewardAdmin()};
-    $('kx47CreateCard').onclick=async()=>{
-      if(!isAdmin())return;
-      const name=$('kx47CardName').value.trim();
-      if(!name){$('kx47CardAdminMsg').textContent='Bitte einen Kartennamen eingeben.';return}
-      const f=$('kx47CardImage').files[0];
-      const image=await prepareCardImage(f);
+    $('kx47CreateCard').onclick=async(e)=>{
+      e?.preventDefault();
+      const out=$('kx47CardAdminMsg');
       try{
-        const sb=window.KX47Supabase?.();if(!sb)throw new Error('Supabase nicht verbunden.');
+        if(!isAdmin()){ if(out)out.textContent='ADMIN_REQUIRED: Dein Konto hat keine Manager/Owner-Rolle.'; return; }
+        const name=$('kx47CardName').value.trim();
+        if(!name){if(out)out.textContent='Bitte einen Kartennamen eingeben.';return}
+        if(out)out.textContent='Karte wird gespeichert…';
+        const f=$('kx47CardImage').files[0];
+        const image=await prepareCardImage(f);
+        const sb=window.KX47Supabase?.();
+        if(!sb)throw new Error('Supabase nicht verbunden.');
         const cardId='card_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-        const {error}=await sb.rpc('admin_create_card',{
-          card_id:cardId,
-          card_name:name,
-          card_rarity:normalizeRarity($('kx47CardRarity').value),
-          card_description:$('kx47CardDesc').value.trim(),
-          card_image:image||''
-        });
-        if(error)throw error;
+        const payload={card_id:cardId,card_name:name,card_rarity:normalizeRarity($('kx47CardRarity').value),card_description:$('kx47CardDesc').value.trim(),card_image:image||''};
+        const result=await sb.rpc('admin_create_card',payload);
+        if(result.error){
+          const er=result.error;
+          throw new Error([er.message,er.details,er.hint,er.code].filter(Boolean).join(' | '));
+        }
         await refreshServerCards();
         $('kx47CardName').value='';
         $('kx47CardRarity').value='Nicht selten';
         $('kx47CardDesc').value='';
         $('kx47CardImage').value='';
         $('kx47CardPreview').removeAttribute('src');
-        $('kx47CardAdminMsg').textContent='Karte wurde serverseitig erstellt und steht jetzt für alle Accounts im Sammelalbum zur Verfügung.';
+        if(out)out.textContent='✅ Karte wurde erstellt und ist jetzt für alle Accounts verfügbar.';
         renderCardAdmin();
         await renderGrantControls();
       }catch(err){
-        $('kx47CardAdminMsg').textContent=err?.message||'Karte konnte nicht erstellt werden.';
+        console.error('KX47 admin_create_card',err);
+        if(out)out.textContent='❌ Karte konnte nicht erstellt werden: '+(err?.message||String(err));
       }
     };
 
