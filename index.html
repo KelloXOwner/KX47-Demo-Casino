@@ -2531,6 +2531,37 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
   const $=id=>document.getElementById(id);
   const cards=()=>{try{const a=JSON.parse(localStorage.getItem(CKEY)||'[]');return Array.isArray(a)?a:[]}catch{return[]}};
   const saveCards=a=>localStorage.setItem(CKEY,JSON.stringify(a));
+  let cardsSyncing=false;
+  async function syncCardsFromSupabase(){
+    const client=window.KX47Supabase?.();
+    if(!client||cardsSyncing)return;
+    cardsSyncing=true;
+    try{
+      const {data,error}=await client.from('kx47_cards').select('id,name,rarity,description,image,created_at').order('created_at',{ascending:true});
+      if(error) throw error;
+      const serverCards=Array.isArray(data)?data:[];
+      const localCards=cards();
+      // One-time migration: if this browser still has cards created by the old
+      // local-only version and the server table is empty, copy them to Supabase.
+      if(serverCards.length===0 && localCards.length && isAdmin()){
+        for(const c of localCards){
+          const {error:insErr}=await client.rpc('kx47_admin_create_card_v2',{
+            p_id:String(c.id),p_name:String(c.name||''),p_rarity:normalizeRarity(c.rarity),
+            p_description:String(c.description||''),p_image:String(c.image||'')
+          });
+          if(insErr) console.warn('KX47 Karten-Migration:',insErr.message);
+        }
+        const again=await client.from('kx47_cards').select('id,name,rarity,description,image,created_at').order('created_at',{ascending:true});
+        if(!again.error) saveCards(again.data||[]); else saveCards(localCards);
+      }else{
+        saveCards(serverCards);
+      }
+      if($('kx47AlbumModal')?.classList.contains('open'))renderAlbum();
+      if($('kx47AdminAlbum')){renderCardAdmin();renderGrantControls();}
+    }catch(e){
+      console.warn('KX47 Karten konnten nicht aus Supabase geladen werden:',e?.message||e);
+    }finally{cardsSyncing=false}
+  }
   const rewards=()=>{try{const a=JSON.parse(localStorage.getItem(RKEY)||'[]');return Array.isArray(a)?a:[]}catch{return[]}};
   const saveRewards=a=>localStorage.setItem(RKEY,JSON.stringify(a));
   const me=()=>window.KX47GetProfile?window.KX47GetProfile():null;
@@ -2734,7 +2765,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
       <section id="kx47AdminAlbum" class="kx47-admin-extra">
         <div class="admin-card"><h3>🎴 Karten-Picks & Karten an Accounts vergeben</h3><p class="kx47-small-note">Der Manager kann jedem bestehenden Account beliebig viele Karten-Picks oder eine beliebige vorhandene Karte direkt ins Inventar/Sammelalbum geben.</p>
         <div class="kx47-admin-form"><select id="kx47GrantUser"></select><select id="kx47GrantCard"></select><input id="kx47GrantPicks" type="number" min="0" step="1" value="1" placeholder="Anzahl Picks"><button class="gold" id="kx47GrantCardBtn">🎴 Karte vergeben</button><button class="dark" id="kx47GrantPicksBtn">🎁 Picks vergeben</button></div><p id="kx47GrantMsg" class="kx47-small-note"></p></div>
-        <div class="admin-card"><h3>🎴 Karte erstellen</h3><p class="kx47-small-note">Jede hier gespeicherte Karte wird automatisch als freischaltbare Karte in jedes bestehende Sammelalbum aufgenommen.</p>
+        <div class="admin-card"><h3>🎴 Karte erstellen</h3><p class="kx47-small-note">Jede hier gespeicherte Karte wird dauerhaft in Supabase gespeichert und erscheint nach jedem Seiten-Reload als freischaltbare Karte im Sammelalbum.</p>
         <div class="kx47-admin-form"><input id="kx47CardName" placeholder="Kartenname"><select id="kx47CardRarity"><option>Nicht selten</option><option>selten</option><option>episch</option><option>Legänder</option><option>Exclusiv</option><option>Legende</option><option>Goty</option></select><input id="kx47CardDesc" class="full" placeholder="Beschreibung"><label class="admin-note">Kartenbild <input id="kx47CardImage" type="file" accept="image/*"></label><img id="kx47CardPreview" class="kx47-admin-preview" alt="Vorschau"><button class="gold full" id="kx47CreateCard">Karte erstellen</button></div><div class="kx47-rarity-note"><b>Zieh-Wahrscheinlichkeit:</b> Die Seltenheit steuert die Gewichtung. Nicht selten ist am häufigsten, selten deutlich häufiger als episch, und <b>Legänder / Exclusiv / Legende / Goty</b> sind extrem schwer zu ziehen. Die Werte sind bewusst als relative Gewichte angelegt, damit seltene Karten wirklich selten bleiben.</div><p id="kx47CardAdminMsg" class="kx47-small-note"></p><div class="kx47-card-admin-list" id="kx47CardAdminList"></div></div>
       </section>`;
     host.appendChild(tabs);
@@ -2752,12 +2783,32 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
     const img=$('kx47CardImage');if(img)img.onchange=()=>{const f=img.files[0];if(!f)return;const url=URL.createObjectURL(f);$('kx47CardPreview').src=url;$('kx47CardPreview').style.objectFit='contain';};
     setupGrantControls();
     $('kx47CreateReward').onclick=()=>{if(!isAdmin())return;const name=$('kx47RewardName').value.trim(),amount=Number($('kx47RewardAmount').value);if(!name||amount<1)return;const a=rewards();a.push({id:'reward_'+Date.now(),name,icon:$('kx47RewardIcon').value.trim()||'🎁',type:$('kx47RewardType').value,amount,description:$('kx47RewardDesc').value.trim()});saveRewards(a);$('kx47RewardName').value='';$('kx47RewardDesc').value='';renderRewardAdmin()};
-    $('kx47CreateCard').onclick=async()=>{if(!isAdmin())return;const name=$('kx47CardName').value.trim();if(!name){$('kx47CardAdminMsg').textContent='Bitte einen Kartennamen eingeben.';return}const f=$('kx47CardImage').files[0];const image=await prepareCardImage(f);const a=cards();a.push({id:'card_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),name,rarity:normalizeRarity($('kx47CardRarity').value),description:$('kx47CardDesc').value.trim(),image});saveCards(a);
-      // Creating a card only adds it to the global album pool. It must NOT be
-      // automatically owned by any account; ownership is granted only by a pick
-      // or explicitly through the admin's 'Karte vergeben' action.
-      const allUsers=safeUsers(); allUsers.forEach(u=>{ensureUser(u); u.collection=u.collection.map(x=>typeof x==='object'&&x?String(x.id||''):String(x)).filter(Boolean).filter(x=>x!==a[a.length-1].id);}); saveUsers(allUsers);
-      $('kx47CardName').value='';$('kx47CardRarity').value='';$('kx47CardDesc').value='';$('kx47CardImage').value='';$('kx47CardPreview').removeAttribute('src');$('kx47CardAdminMsg').textContent='Karte erstellt und automatisch ins Sammelalbum aufgenommen.';renderCardAdmin();renderGrantControls()};
+    $('kx47CreateCard').onclick=async()=>{
+      if(!isAdmin())return;
+      const out=$('kx47CardAdminMsg');
+      try{
+        const name=$('kx47CardName').value.trim();
+        if(!name){if(out)out.textContent='Bitte einen Kartennamen eingeben.';return}
+        const client=window.KX47Supabase?.();
+        if(!client)throw new Error('Supabase nicht verbunden.');
+        const f=$('kx47CardImage').files[0];
+        const image=await prepareCardImage(f);
+        const card={id:'card_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),name,rarity:normalizeRarity($('kx47CardRarity').value),description:$('kx47CardDesc').value.trim(),image};
+        const {data,error}=await client.rpc('kx47_admin_create_card_v2',{p_id:card.id,p_name:card.name,p_rarity:card.rarity,p_description:card.description,p_image:card.image});
+        if(error)throw error;
+        const saved=data&&Array.isArray(data)?data[0]:data;
+        const local=cards().filter(c=>String(c.id)!==String(card.id));
+        local.push(saved||card);
+        saveCards(local);
+        $('kx47CardName').value='';$('kx47CardRarity').value='';$('kx47CardDesc').value='';$('kx47CardImage').value='';$('kx47CardPreview').removeAttribute('src');
+        if(out)out.textContent='✅ Karte dauerhaft in Supabase gespeichert und damit nach einem Seiten-Reload weiterhin im Album verfügbar.';
+        renderCardAdmin();renderGrantControls();renderAlbum();
+        await syncCardsFromSupabase();
+      }catch(err){
+        console.error(err);
+        if(out)out.textContent='❌ Karte konnte nicht erstellt werden: '+(err?.message||'Unbekannter Fehler');
+      }
+    };
     showTab('overview');
   }
   function fileToData(f){return new Promise(resolve=>{if(!f)return resolve('');const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>resolve('');r.readAsDataURL(f)})}
@@ -2778,19 +2829,26 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
 
   function renderRewardAdmin(){const el=$('kx47RewardAdminList');if(!el)return;el.innerHTML=rewards().length?'<h4 style="margin-top:15px;color:#ffd84d">Erstellte Belohnungen</h4>'+rewards().map(r=>`<div class="kx47-notice"><b>${esc(r.icon)} ${esc(r.name)}</b> · ${fmt(r.amount)} ${r.type==='picks'?'Picks':'Coins'}<br><span class="kx47-small-note">${esc(r.description||'')}</span></div>`).join(''):'<div class="kx47-notice">Noch keine Belohnungen.</div>'}
   function renderCardAdmin(){const el=$('kx47CardAdminList');if(!el)return;el.innerHTML=cards().length?cards().map(c=>`<div class="kx47-card-admin-item"><img src="${cardImage(c)}" alt=""><div><strong>${esc(c.name)}</strong><span class="kx47-small-note">${esc(normalizeRarity(c.rarity))}</span></div><button class="dark" type="button" data-delete-card="${esc(c.id)}">🗑️ Löschen</button></div>`).join(''):'<div class="kx47-notice">Noch keine Karten erstellt.</div>';el.querySelectorAll('[data-delete-card]').forEach(b=>b.onclick=()=>deleteCard(b.dataset.deleteCard))}
-  function deleteCard(id){
+  async function deleteCard(id){
     if(!isAdmin())return;
     const c=cards().find(x=>x.id===id);if(!c)return;
     if(!confirm(`Karte „${c.name}“ wirklich komplett löschen? Sie wird aus dem Sammelalbum entfernt und kann nicht mehr gezogen werden.`))return;
-    saveCards(cards().filter(x=>x.id!==id));
-    const a=safeUsers();a.forEach(u=>{if(Array.isArray(u.collection))u.collection=u.collection.filter(cid=>cid!==id)});saveUsers(a);
-    renderCardAdmin();renderGrantControls();renderAlbum();
-    const msg=$('kx47CardAdminMsg');if(msg)msg.textContent=`„${c.name}“ wurde vollständig gelöscht.`;
+    const msg=$('kx47CardAdminMsg');
+    try{
+      const client=window.KX47Supabase?.();
+      if(!client)throw new Error('Supabase nicht verbunden.');
+      const {error}=await client.rpc('kx47_admin_delete_card_v2',{p_id:String(id)});
+      if(error)throw error;
+      saveCards(cards().filter(x=>String(x.id)!==String(id)));
+      renderCardAdmin();renderGrantControls();renderAlbum();
+      if(msg)msg.textContent=`„${c.name}“ wurde dauerhaft aus Supabase gelöscht.`;
+      await syncCardsFromSupabase();
+    }catch(err){if(msg)msg.textContent='❌ Karte konnte nicht gelöscht werden: '+(err?.message||'Unbekannter Fehler')}
   }
 
   // Make the admin account the only super-admin identity used by this expansion.
   function watchAdmin(){if(isAdmin())adminPanel()}
-  injectUI();setTimeout(watchAdmin,200);setInterval(watchAdmin,800);
+  injectUI();setTimeout(watchAdmin,200);setTimeout(syncCardsFromSupabase,900);setInterval(watchAdmin,800);setInterval(syncCardsFromSupabase,15000);
   window.addEventListener('storage',()=>{if($('kx47AlbumModal')?.classList.contains('open'))renderAlbum()});
 
   // Comprehensive rule dialog shown BEFORE every new game is opened.
