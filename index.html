@@ -812,7 +812,7 @@ footer p + p {
 .auth-box,.admin-box{width:min(980px,100%);max-height:92vh;overflow:auto;background:linear-gradient(145deg,#151515,#080808);border:1px solid #6f5a22;border-radius:22px;box-shadow:0 30px 100px #000,0 0 50px rgba(212,175,55,.12);padding:28px}
 .auth-box{max-width:460px}.auth-box h2,.admin-box h2{color:#ffd84d;margin-bottom:8px}
 .auth-box input,.admin-box input,.admin-box select{width:100%;padding:13px 14px;margin:7px 0;background:#0f0f0f;color:#fff;border:1px solid #333;border-radius:10px}
-.auth-tabs{display:flex;gap:8px;margin:18px 0}.auth-tabs button{flex:1}.auth-tabs .active{background:linear-gradient(135deg,#d4af37,#ffd84d);color:#111}
+.auth-tabs{display:flex;gap:8px;margin:18px 0}.guest-login{width:100%;margin-top:10px;background:#222;color:#ffd84d;border:1px solid #6f5a22}.guest-note{margin-top:8px;color:#8f8f8f;font-size:11px;text-align:center}.auth-tabs button{flex:1}.auth-tabs .active{background:linear-gradient(135deg,#d4af37,#ffd84d);color:#111}
 .auth-close{float:right;background:#222;color:#fff;padding:8px 12px}
 .role-pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#292929;color:#ffd84d;font-size:12px;font-weight:800}
 .admin-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.admin-card{background:#101010;border:1px solid #292929;border-radius:15px;padding:18px}.user-row{display:grid;grid-template-columns:1fr 120px 150px 100px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #242424;font-size:13px}.admin-note{color:#999;font-size:12px;line-height:1.5}
@@ -1069,7 +1069,7 @@ footer p + p {
   <div class="auth-box">
     <button class="auth-close" id="authClose">✕</button>
     <h2>KX47 Konto</h2>
-    <p class="admin-note">Demo-Account-System für diese lokale KX47-Version.</p>
+    <p class="admin-note">KX47 Konto · sichere Anmeldung über Supabase. Gastkonten können ohne E-Mail erstellt werden.</p>
     <div class="auth-tabs">
       <button id="tabLogin" class="active">Anmelden</button>
       <button id="tabRegister">Registrieren</button>
@@ -1079,6 +1079,8 @@ footer p + p {
       <input id="authEmail" type="text" required placeholder="E-Mail oder Benutzername" autocomplete="username">
       <input id="authPassword" type="password" required minlength="8" placeholder="Passwort (min. 8 Zeichen)" autocomplete="current-password">
       <button class="gold" style="width:100%;margin-top:10px" id="authSubmit">Anmelden</button>
+      <button type="button" class="guest-login" id="guestLoginButton">Als Gast anmelden</button>
+      <p class="guest-note">Gastkonten werden automatisch als Gast1, Gast2, Gast3 usw. angelegt und im Admin-Panel angezeigt.</p>
     </form>
     <p id="authMessage" class="admin-note" style="margin-top:12px"></p>
   </div>
@@ -1089,7 +1091,7 @@ footer p + p {
   <div class="admin-box">
     <button class="auth-close" id="adminClose">✕</button>
     <h2>KX47 Admin Panel</h2>
-    <p id="adminIdentity" class="admin-note"></p>
+    <p id="adminIdentity" class="admin-note"></p><p class="admin-note" style="margin-top:8px;color:#ffd84d">Owner wird serverseitig über Supabase verwaltet. Kein Owner-Passwort ist in dieser HTML-Datei gespeichert.</p>
     <div class="admin-grid">
       <section class="admin-card">
         <h3>Coins vergeben</h3>
@@ -1213,7 +1215,7 @@ function clampBetValue(v) {
     if(!sb) return null;
     const {data:{user}} = await sb.auth.getUser();
     if(!user) return null;
-    const {data,error} = await sb.from("profiles").select("id,username,email,role,coins,created_at").eq("id",user.id).single();
+    const {data,error} = await sb.from("profiles").select("id,username,email,role,coins,created_at,is_guest,card_picks").eq("id",user.id).single();
     if(error || !data) return null;
     return data;
   }
@@ -1242,6 +1244,24 @@ function clampBetValue(v) {
     if(msg) msg.textContent="";
   }
   function openAuth(){ setMode(false); auth?.classList.add("open"); loginEl?.focus(); }
+
+  async function signInAsGuest(){
+    if(!sb){ showConfigError(); return; }
+    const guestBtn=$("guestLoginButton");
+    if(guestBtn) guestBtn.disabled=true;
+    if(msg) msg.textContent="Gastkonto wird erstellt…";
+    try{
+      const {data,error}=await sb.auth.signInAnonymously({options:{data:{is_guest:true}}});
+      if(error) throw error;
+      profile=await getProfile();
+      if(!profile) throw new Error("Gastkonto konnte nicht freigeschaltet werden. Bitte die KX47-Gast-SQL-Erweiterung in Supabase ausführen.");
+      msg.textContent=`Willkommen ${profile.username}!`;
+      syncUI();
+      setTimeout(()=>auth?.classList.remove("open"),500);
+    }catch(err){
+      msg.textContent=err?.message||"Gast-Anmeldung fehlgeschlagen.";
+    }finally{ if(guestBtn) guestBtn.disabled=false; }
+  }
 
   async function signOut(){
     if(sb) await sb.auth.signOut();
@@ -1297,12 +1317,12 @@ function clampBetValue(v) {
     try{
       const users=await adminUsers();
       $("adminIdentity").innerHTML=`Angemeldet als <strong>${esc(profile.username)}</strong> · <span class="role-pill">${esc(profile.role)}</span>`;
-      const opts=users.map(u=>`<option value="${esc(u.id)}">${esc(u.username)} · ${esc(u.email)}</option>`).join("");
+      const opts=users.map(u=>`<option value="${esc(u.id)}">${esc(u.username)} · ${u.is_guest ? "Gastkonto" : esc(u.email || "Keine E-Mail")}</option>`).join("");
       $("coinTarget").innerHTML=opts; $("roleTarget").innerHTML=opts;
       $("userList").innerHTML=users.map(u=>`<div class="user-row">
-        <div><strong>${esc(u.username)}</strong><br><span class="admin-note">${esc(u.email)}</span></div>
+        <div><strong>${esc(u.username)}</strong><br><span class="admin-note">${u.is_guest ? 'Gastkonto' : esc(u.email || 'Keine E-Mail')}</span></div>
         <div><span class="role-pill">${esc(u.role)}</span></div>
-        <div>🪙 ${Number(u.coins||0).toLocaleString("de-DE")}</div>
+        <div>🪙 ${Number(u.coins||0).toLocaleString("de-DE")}<br><span class="admin-note">🎴 ${Number(u.card_picks||0).toLocaleString("de-DE")} Picks</span></div>
         <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;flex-wrap:wrap">
           ${u.id===profile.id?'<span class="role-pill">Du</span>':`<button class="dark delete-user-btn" data-user-id="${esc(u.id)}" style="padding:7px 10px;background:#4a1414;border:1px solid #8d2d2d;color:#fff">🗑 Löschen</button>`}
         </div></div>`).join("");
@@ -1325,6 +1345,7 @@ function clampBetValue(v) {
   tabLogin?.addEventListener("click",()=>setMode(false));
   tabRegister?.addEventListener("click",()=>setMode(true));
   loginBtn?.addEventListener("click",openAuth);
+  $("guestLoginButton")?.addEventListener("click",signInAsGuest);
   $("authClose")?.addEventListener("click",()=>auth?.classList.remove("open"));
   adminBtn?.addEventListener("click",async()=>{ if(isAdmin(profile)){ await renderAdmin(); admin?.classList.add("open"); } else alert("Kein Zugriff."); });
   $("adminClose")?.addEventListener("click",()=>admin?.classList.remove("open"));
@@ -1353,6 +1374,7 @@ function clampBetValue(v) {
   // If the page has a logout control later, it can call window.KX47Logout().
   window.KX47Logout=signOut;
   window.KX47GetProfile=()=>profile;
+  window.KX47RefreshProfile=async()=>{ profile=await getProfile(); syncUI(); return profile; };
   window.KX47Supabase=()=>sb;
 
   setMode(false);
@@ -2467,7 +2489,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
   function ensureUser(u){
     if(!u)return;
     if(!Array.isArray(u.collection))u.collection=[];
-    if(!Number.isFinite(Number(u.cardPicks)))u.cardPicks=0;
+    if(!Number.isFinite(Number(u.card_picks ?? u.cardPicks)))u.cardPicks=0;
     if(!Number.isFinite(Number(u.totalWins)))u.totalWins=0;
     if(!Number.isFinite(Number(u.totalWonCoins)))u.totalWonCoins=0;
   }
@@ -2495,14 +2517,14 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
     renderUserRewards();
   }
   function renderPicks(){
-    const u=me();const box=$('kx47PickBox');if(!u||Number(u.cardPicks)<=0){box.innerHTML='<h3>🎴 Pick-Inventar</h3><p>Du hast aktuell keine Karten-Picks. Gewinne von 100.000 Coins oder mehr geben dir 1 Pick pro volle 100.000 Coins.</p>';return}
+    const u=me();const box=$('kx47PickBox');if(!u||Number(u.card_picks ?? u.cardPicks)<=0){box.innerHTML='<h3>🎴 Pick-Inventar</h3><p>Du hast aktuell keine Karten-Picks. Gewinne von 100.000 Coins oder mehr geben dir 1 Pick pro volle 100.000 Coins.</p>';return}
     const owned=new Set(Array.isArray(u.collection)?u.collection:[]), available=cards().filter(c=>!owned.has(c.id));
     if(!available.length){box.innerHTML=`<h3>🎴 Pick-Inventar</h3><p>Du hast <b>${fmt(u.cardPicks)}</b> Pick(s) gesammelt, aber bereits alle vorhandenen Karten freigeschaltet. Neue Karten können später mit deinen gespeicherten Picks geöffnet werden.</p>`;return}
     box.innerHTML=`<h3>🎴 Pick-Inventar</h3><p>Du hast <b>${fmt(u.cardPicks)}</b> Karten-Pick(s) gesammelt. Du kannst sie jederzeit einzeln öffnen.</p><button class="gold" id="kx47OpenPick">🎁 1 Karten-Pick öffnen</button><div id="kx47PickChoices"></div>`;
     $('kx47OpenPick').onclick=()=>openOnePick();
   }
   function openOnePick(){
-    const u=me();if(!u||Number(u.cardPicks)<=0)return;ensureUser(u);
+    const u=me();if(!u||Number(u.card_picks ?? u.cardPicks)<=0)return;ensureUser(u);
     const owned=new Set(Array.isArray(u.collection)?u.collection:[]),available=cards().filter(c=>!owned.has(c.id));
     if(!available.length){renderPicks();return}
     const choices=weightedChoices(available,Math.min(3,available.length));
@@ -2557,7 +2579,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
     if(u.collection.includes(cardId))return;
 
     u.collection.push(cardId);
-    u.cardPicks=Math.max(0,Number(u.cardPicks)-1);
+    u.cardPicks=Math.max(0,Number(u.card_picks ?? u.cardPicks)-1);
     saveUsers(allUsers);
 
     // Refresh the current session copy and every visible album component.
@@ -2659,7 +2681,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
     renderGrantControls();
     const gb=$('kx47GrantCardBtn'),pb=$('kx47GrantPicksBtn');
     if(gb&&!gb.dataset.bound){gb.dataset.bound='1';gb.onclick=()=>{if(!isAdmin())return;const uid=$('kx47GrantUser').value,cid=$('kx47GrantCard').value,a=safeUsers(),u=a.find(x=>x.id===uid),c=cards().find(x=>x.id===cid);if(!u||!c){$('kx47GrantMsg').textContent='Bitte Account und Karte auswählen.';return}ensureUser(u);if(u.collection.includes(c.id)){$('kx47GrantMsg').textContent=`${u.username} besitzt diese Karte bereits.`;return}u.collection.push(c.id);saveUsers(a);$('kx47GrantMsg').textContent=`🎴 ${c.name} wurde ${u.username} direkt ins Sammelalbum gegeben.`;renderAlbum();};}
-    if(pb&&!pb.dataset.bound){pb.dataset.bound='1';pb.onclick=()=>{if(!isAdmin())return;const uid=$('kx47GrantUser').value,n=Math.max(0,Math.floor(Number($('kx47GrantPicks').value)||0)),a=safeUsers(),u=a.find(x=>x.id===uid);if(!u||n<1){$('kx47GrantMsg').textContent='Bitte Account und eine gültige Pick-Anzahl eingeben.';return}ensureUser(u);u.cardPicks+=n;saveUsers(a);$('kx47GrantMsg').textContent=`🎁 ${fmt(n)} Pick(s) wurden ${u.username} ins Inventar gegeben. Gesamt: ${fmt(u.cardPicks)}.`;if(me()?.id===u.id)renderAlbum();};}
+    if(pb&&!pb.dataset.bound){pb.dataset.bound='1';pb.onclick=async()=>{if(!isAdmin())return;const uid=$('kx47GrantUser').value,n=Math.max(0,Math.floor(Number($('kx47GrantPicks').value)||0));if(!uid||n<1){$('kx47GrantMsg').textContent='Bitte Account und eine gültige Pick-Anzahl eingeben.';return}try{const sb=window.KX47Supabase?.();if(!sb)throw new Error('Supabase nicht verbunden.');const {error}=await sb.rpc('admin_grant_picks',{target_id:uid,amount:n});if(error)throw error;$('kx47GrantMsg').textContent=`🎁 ${fmt(n)} Pick(s) wurden serverseitig gutgeschrieben.`;if(me()?.id===uid){const fresh=await window.KX47RefreshProfile?.();if(fresh)renderAlbum();}}catch(err){$('kx47GrantMsg').textContent=err?.message||'Picks konnten nicht vergeben werden.';}};}
   }
 
   function renderRewardAdmin(){const el=$('kx47RewardAdminList');if(!el)return;el.innerHTML=rewards().length?'<h4 style="margin-top:15px;color:#ffd84d">Erstellte Belohnungen</h4>'+rewards().map(r=>`<div class="kx47-notice"><b>${esc(r.icon)} ${esc(r.name)}</b> · ${fmt(r.amount)} ${r.type==='picks'?'Picks':'Coins'}<br><span class="kx47-small-note">${esc(r.description||'')}</span></div>`).join(''):'<div class="kx47-notice">Noch keine Belohnungen.</div>'}
