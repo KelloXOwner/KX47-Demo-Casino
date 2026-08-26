@@ -2545,7 +2545,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
       // local-only version and the server table is empty, copy them to Supabase.
       if(serverCards.length===0 && localCards.length && isAdmin()){
         for(const c of localCards){
-          const {error:insErr}=await client.rpc('kx47_create_card_persist',{
+          const {error:insErr}=await client.rpc('kx47_create_card_v3',{
             p_id:String(c.id),p_name:String(c.name||''),p_rarity:normalizeRarity(c.rarity),
             p_description:String(c.description||''),p_image:String(c.image||'')
           });
@@ -2794,8 +2794,8 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
         const f=$('kx47CardImage').files[0];
         const image=await prepareCardImage(f);
         const card={id:'card_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),name,rarity:normalizeRarity($('kx47CardRarity').value),description:$('kx47CardDesc').value.trim(),image};
-        const {data,error}=await client.rpc('kx47_create_card_persist',{p_id:card.id,p_name:card.name,p_rarity:card.rarity,p_description:card.description,p_image:card.image});
-        if(error)throw error;
+        const {data,error}=await client.rpc('kx47_create_card_v3',{p_id:card.id,p_name:card.name,p_rarity:card.rarity,p_description:card.description,p_image:card.image});
+        if(error){ throw new Error((error.message||'Supabase RPC Fehler')+' | code: '+(error.code||'')+' | details: '+(error.details||'')); }
         const saved=data&&Array.isArray(data)?data[0]:data;
         const local=cards().filter(c=>String(c.id)!==String(card.id));
         local.push(saved||card);
@@ -2813,7 +2813,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
   }
   function fileToData(f){return new Promise(resolve=>{if(!f)return resolve('');const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>resolve('');r.readAsDataURL(f)})}
   // Normalize every uploaded card image to the album's fixed card format while keeping the entire image visible.
-  function prepareCardImage(file){return new Promise(resolve=>{if(!file)return resolve('');const img=new Image();const reader=new FileReader();reader.onload=()=>{img.onload=()=>{const W=500,H=650;const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');ctx.fillStyle='#171717';ctx.fillRect(0,0,W,H);const scale=Math.min(W/img.naturalWidth,H/img.naturalHeight);const w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);const x=Math.round((W-w)/2),y=Math.round((H-h)/2);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,x,y,w,h);resolve(canvas.toDataURL('image/jpeg',0.92));};img.onerror=()=>resolve('');img.src=reader.result};reader.onerror=()=>resolve('');reader.readAsDataURL(file)});}
+  function prepareCardImage(file){return new Promise(resolve=>{if(!file)return resolve('');const img=new Image();const reader=new FileReader();reader.onload=()=>{img.onload=()=>{const W=360,H=468;const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');ctx.fillStyle='#171717';ctx.fillRect(0,0,W,H);const scale=Math.min(W/img.naturalWidth,H/img.naturalHeight);const w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);const x=Math.round((W-w)/2),y=Math.round((H-h)/2);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,x,y,w,h);resolve(canvas.toDataURL('image/jpeg',0.72));};img.onerror=()=>resolve('');img.src=reader.result};reader.onerror=()=>resolve('');reader.readAsDataURL(file)});}
   function renderGrantControls(){
     const us=$('kx47GrantUser'),cs=$('kx47GrantCard');if(!us||!cs)return;
     const list=safeUsers();
