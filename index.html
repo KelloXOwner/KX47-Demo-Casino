@@ -2269,7 +2269,7 @@ async function spinDemo(){
  const result=evalGrid(final,bet||getBet());
  if(result.scatterCount>=3&&!freeSpins){freeSpins=10;expandedSymbol=SLOT_SYMBOLS[Math.floor(Math.random()*5)].id;featureText.textContent=`10 Freispiele · ${symbolById(expandedSymbol).tag} kann expandieren`;featureBanner.classList.add("show");setTimeout(()=>featureBanner.classList.remove("show"),1800)}
  if(freeSpins>0){freeSpins--;if(expandedSymbol&&Math.random()<.28){for(let x=0;x<5;x++)for(let y=0;y<3;y++)if(final[x][y]===expandedSymbol)final[x]=[expandedSymbol,expandedSymbol,expandedSymbol]}}
- if(result.total>0){balance+=result.total;window.KX47RegisterWin&&window.KX47RegisterWin(result.total);localStorage.setItem("KX47Balance",balance);drawGrid(final,result.highlights);gameResult.innerHTML=`<span class="big-win">+€${Math.floor(result.total).toLocaleString("de-DE")}</span>`}else gameResult.textContent=freeSpins?"Kein Gewinn – nächstes Freispiel…":"Kein Gewinn – noch einmal drehen.";
+ if(result.total>0){balance+=result.total;const awarded=window.KX47RegisterWin?await window.KX47RegisterWin(result.total):0;localStorage.setItem("KX47Balance",balance);drawGrid(final,result.highlights);gameResult.innerHTML=`<span class="big-win">+€${Math.floor(result.total).toLocaleString("de-DE")}</span>${awarded?` <span class="big-win">🎴 +${awarded} Pick${awarded===1?"":"s"} gewonnen!</span>`:""}`}else gameResult.textContent=freeSpins?"Kein Gewinn – nächstes Freispiel…":"Kein Gewinn – noch einmal drehen.";
  updateBalance();updateSlotHud(result.total); if(typeof awardXP==="function"){ awardXP(8 + (result.total>0 ? Math.min(35,5+Math.floor(result.total/1000)) : 0)); } spinning=false;spinButton.disabled=false;spinButton.classList.remove("spinning")
 }
 function closeGame(){ if(spinning) return; gameModal.classList.remove("open"); gameModal.setAttribute("aria-hidden","true"); document.body.classList.remove("modal-open"); }
@@ -2570,7 +2570,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
     renderUserRewards();
   }
   function renderPicks(){
-    const u=me();const box=$('kx47PickBox');if(!u||Number(u.card_picks ?? u.cardPicks)<=0){box.innerHTML='<h3>🎴 Pick-Inventar</h3><p>Du hast aktuell keine Karten-Picks. Gewinne von 100.000 Coins oder mehr geben dir 1 Pick pro volle 100.000 Coins.</p>';return}
+    const u=me();const box=$('kx47PickBox');if(!u||Number(u.card_picks ?? u.cardPicks)<=0){box.innerHTML='<h3>🎴 Pick-Inventar</h3><p>Du hast aktuell keine Karten-Picks. Gewinne geben dir pro volle 400.000 Coins 1 Karten-Pick.</p>';return}
     const owned=new Set(Array.isArray(u.collection)?u.collection:[]), available=cards().filter(c=>!owned.has(c.id));
     if(!available.length){box.innerHTML=`<h3>🎴 Pick-Inventar</h3><p>Du hast <b>${fmt(u.cardPicks)}</b> Pick(s) gesammelt, aber bereits alle vorhandenen Karten freigeschaltet. Neue Karten können später mit deinen gespeicherten Picks geöffnet werden.</p>`;return}
     box.innerHTML=`<h3>🎴 Pick-Inventar</h3><p>Du hast <b>${fmt(u.cardPicks)}</b> Karten-Pick(s) gesammelt. Du kannst sie jederzeit einzeln öffnen.</p><button class="gold" id="kx47OpenPick">🎁 1 Karten-Pick öffnen</button><div id="kx47PickChoices"></div>`;
@@ -2651,21 +2651,52 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
     list.innerHTML=rs.map(r=>`<article class="kx47-reward"><h4>${esc(r.icon||'🎁')} ${esc(r.name)}</h4><p>${esc(r.description||'')}</p><p><b>${r.type==='picks'?fmt(r.amount)+' Karten-Pick(s)':fmt(r.amount)+' Coins'}</b></p></article>`).join('');
   }
 
-  // Win accounting: 1 pick per full 100,000 Coins won in a single win.
-  // The global switch is checked server-side before a pick can be awarded.
+  // Win accounting: 1 pick per full 400,000 Coins won in a single win.
+  // The award itself is performed server-side so the Pick inventory is persistent.
+  function showPickWinNotice(picks, winAmount){
+    const count=Math.max(1,Number(picks)||1);
+    let toast=$('kx47PickWinToast');
+    if(!toast){
+      toast=document.createElement('div');
+      toast.id='kx47PickWinToast';
+      toast.style.cssText='position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-20px);z-index:100000;opacity:0;pointer-events:none;transition:.28s ease;background:linear-gradient(135deg,#1b1408,#3a2807);border:2px solid #ffd84d;border-radius:16px;box-shadow:0 12px 45px rgba(0,0,0,.65),0 0 30px rgba(255,216,77,.25);padding:14px 20px;text-align:center;color:#fff;min-width:min(360px,90vw);font-weight:900';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML=`<div style="font-size:22px;color:#ffd84d">🎴 +${fmt(count)} Karten-Pick${count===1?'':'s'} gewonnen!</div><div style="margin-top:4px;color:#ddd;font-size:13px">Gewinn: ${fmt(winAmount)} Coins · Der Pick wurde deinem Inventar gutgeschrieben.</div>`;
+    requestAnimationFrame(()=>{toast.style.opacity='1';toast.style.transform='translateX(-50%) translateY(0)'});
+    clearTimeout(toast._timer);
+    toast._timer=setTimeout(()=>{toast.style.opacity='0';toast.style.transform='translateX(-50%) translateY(-20px)'},5000);
+  }
+
   window.KX47RegisterWin=async function(amount){
-    const n=Math.floor(Number(amount)||0);if(n<100000)return;
-    const u=me();if(!u)return;ensureUser(u);
+    const n=Math.floor(Number(amount)||0);
+    if(n<400000)return 0;
+    const u=me();if(!u)return 0;
     try{
       const client=window.KX47Supabase?.();
-      if(!client) return;
-      const {data,error}=await client.rpc("kx47_get_picks_enabled");
-      if(error || data===false) return;
-      const picks=Math.floor(n/100000);if(picks<1)return;
-      u.cardPicks+=picks;u.totalWins+=1;u.totalWonCoins+=n;persistMe();
-      const msg=$('gameResult');if(msg)msg.insertAdjacentHTML('beforeend',` <span class="big-win">🎴 +${fmt(picks)} Karten-Pick${picks===1?'':'s'}</span>`);
+      if(!client)return 0;
+      const {data,error}=await client.rpc('kx47_award_picks_from_win',{p_win_amount:n});
+      if(error)throw error;
+      const picks=Math.max(0,Number(data)||0);
+      if(picks<1)return 0;
+
+      // Refresh from Supabase so the inventory shown to the user is the actual server value.
+      const fresh=await window.KX47RefreshProfile?.();
+      const freshPicks=Number(fresh?.card_picks ?? fresh?.cardPicks ?? (Number(u.cardPicks||0)+picks));
+      u.cardPicks=freshPicks;
+      u.card_picks=freshPicks;
+      u.totalWins=(Number(u.totalWins)||0)+1;
+      u.totalWonCoins=(Number(u.totalWonCoins)||0)+n;
+
+      showPickWinNotice(picks,n);
+      const msg=$('gameResult');
+      if(msg)msg.insertAdjacentHTML('beforeend',` <span class="big-win">🎴 +${fmt(picks)} Pick${picks===1?'':'s'} gewonnen!</span>`);
       if($('kx47AlbumModal')?.classList.contains('open'))renderAlbum();
-    }catch(e){ /* fail closed: no new pick when the setting cannot be verified */ }
+      return picks;
+    }catch(e){
+      console.warn('KX47 Pick-Vergabe fehlgeschlagen:',e);
+      return 0;
+    }
   };
 
   // Seed no cards; cards created in admin are automatically part of the album.
@@ -2768,7 +2799,7 @@ function sabacc(){const values=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8
     <ul><li>Alle Spiele verwenden ausschließlich virtuelle Demo-Credits – kein Echtgeld.</li>
     <li>Vor dem Start wird kein Einsatz abgebucht. Der Einsatz wird erst mit der eigentlichen Spielaktion berechnet.</li>
     <li>Gewinne werden nach Abschluss der Spielrunde gutgeschrieben.</li>
-    <li>Ein einzelner Gewinn von 100.000 Coins oder mehr gibt 1 Karten-Pick pro volle 100.000 Coins. Beispiel: 200.000 = 2 Picks, 1.000.000 = 10 Picks.</li></ul>
+    <li>Ein einzelner Gewinn gibt 1 Karten-Pick pro volle 400.000 Coins. Beispiel: 400.000 = 1 Pick, 800.000 = 2 Picks, 1.000.000 = 2 Picks.</li></ul>
     <h3 style="color:#ffd84d;margin:8px 0">Spielablauf</h3>
     <ul><li><b>Slots:</b> Einsatz wählen, „Drehen“ drücken. 5 Walzen und 3 Reihen bilden das Ergebnis; Gewinnlinien, Wild und Scatter richten sich nach der eingeblendeten Gewinntabelle. 3+ Scatter können Freispiele auslösen.</li>
     <li><b>Bonus Wheel:</b> 100.000 Credits pro Spin. Das Rad stoppt zufällig; das Feld bestimmt den Gewinn.</li>
